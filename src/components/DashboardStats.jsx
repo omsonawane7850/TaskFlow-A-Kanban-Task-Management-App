@@ -1,107 +1,74 @@
 import {
-FiLayers,
-FiCircle,
-FiClock,
-FiCheckCircle,
-FiArrowUpRight,
+  FiLayers,
+  FiCircle,
+  FiClock,
+  FiCheckCircle,
 } from "react-icons/fi";
 
-const statConfig = [
-{
-key: "total",
-label: "Total Tasks",
-color: "blue",
-icon: FiLayers,
-iconBg: "bg-blue-100",
-iconColor: "text-blue-600",
-accent: "bg-blue-500",
-},
-{
-key: "todo",
-label: "To Do",
-color: "violet",
-icon: FiCircle,
-iconBg: "bg-violet-100",
-iconColor: "text-violet-600",
-accent: "bg-violet-500",
-},
-{
-key: "progress",
-label: "In Progress",
-color: "orange",
-icon: FiClock,
-iconBg: "bg-orange-100",
-iconColor: "text-orange-600",
-accent: "bg-orange-500",
-},
-{
-key: "done",
-label: "Completed",
-color: "green",
-icon: FiCheckCircle,
-iconBg: "bg-emerald-100",
-iconColor: "text-emerald-600",
-accent: "bg-emerald-500",
-},
+const statItems = [
+  {
+    key: "total",
+    label: "Total Tasks",
+    icon: FiLayers,
+    iconColor: "text-blue-600",
+    iconBg: "bg-blue-100",
+  },
+  {
+    key: "todo",
+    label: "To Do",
+    icon: FiCircle,
+    iconColor: "text-violet-600",
+    iconBg: "bg-violet-100",
+  },
+  {
+    key: "progress",
+    label: "In Progress",
+    icon: FiClock,
+    iconColor: "text-orange-600",
+    iconBg: "bg-orange-100",
+  },
+  {
+    key: "done",
+    label: "Completed",
+    icon: FiCheckCircle,
+    iconColor: "text-emerald-600",
+    iconBg: "bg-emerald-100",
+  },
 ];
 
 function DashboardStats({ stats }) {
-return ( <section
-   aria-label="Task statistics"
-   className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
- >
-{statConfig.map((item) => {
-const Icon = item.icon;
-const value = stats[item.key] ?? 0;
+  return (
+    <div className="space-y-2">
+      {statItems.map((item) => {
+        const Icon = item.icon;
 
-    return (
-      <article
-        key={item.key}
-        className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-200/60"
-      >
-        {/* Colored accent */}
-        <div
-          className={`absolute left-0 top-0 h-full w-1 ${item.accent}`}
-        />
-
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500">
-              {item.label}
-            </p>
-
-            <h3 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900">
-              {value.toString().padStart(2, "0")}
-            </h3>
-          </div>
-
+        return (
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-xl ${item.iconBg} ${item.iconColor} transition-transform duration-200 group-hover:scale-110`}
+            key={item.key}
+            className="flex items-center justify-between rounded-xl px-3 py-2.5 transition hover:bg-slate-50"
           >
-            <Icon size={23} />
-          </div>
-        </div>
+            <div className="flex min-w-0 items-center gap-3">
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.iconBg} ${item.iconColor}`}
+              >
+                <Icon size={17} />
+              </div>
 
-        <div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
-          <span
-            className={`flex h-6 w-6 items-center justify-center rounded-full ${item.iconBg} ${item.iconColor}`}
-          >
-            <FiArrowUpRight size={15} />
-          </span>
+              <span className="truncate text-sm font-medium text-slate-600">
+                {item.label}
+              </span>
+            </div>
 
-          <p className="text-xs text-slate-500">
-            Tasks in{" "}
-            <span className="font-semibold text-slate-700">
-              {item.label}
+            <span className="ml-2 text-sm font-bold text-slate-800">
+              {(stats[item.key] ?? 0)
+                .toString()
+                .padStart(2, "0")}
             </span>
-          </p>
-        </div>
-      </article>
-    );
-  })}
-</section>
-
-);
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default DashboardStats;
