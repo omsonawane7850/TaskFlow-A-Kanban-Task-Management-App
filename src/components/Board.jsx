@@ -6,40 +6,31 @@ const columns = [
     id: "todo",
     title: "To Do",
     subtitle: "Ready when you are",
-    color: "blue",
     dot: "bg-blue-500",
     headerBg: "bg-blue-50",
     border: "border-blue-100",
-    badge: "bg-blue-100 text-blue-700",
     countBg: "bg-blue-100 text-blue-700",
-    button:
-      "border-blue-200 text-blue-700 hover:bg-blue-100",
+    button: "border-blue-200 text-blue-700 hover:bg-blue-100",
   },
   {
     id: "in-progress",
     title: "In Progress",
     subtitle: "Work in motion",
-    color: "orange",
     dot: "bg-orange-500",
     headerBg: "bg-orange-50",
     border: "border-orange-100",
-    badge: "bg-orange-100 text-orange-700",
     countBg: "bg-orange-100 text-orange-700",
-    button:
-      "border-orange-200 text-orange-700 hover:bg-orange-100",
+    button: "border-orange-200 text-orange-700 hover:bg-orange-100",
   },
   {
     id: "done",
     title: "Done",
     subtitle: "Look at you go!",
-    color: "green",
     dot: "bg-emerald-500",
     headerBg: "bg-emerald-50",
     border: "border-emerald-100",
-    badge: "bg-emerald-100 text-emerald-700",
     countBg: "bg-emerald-100 text-emerald-700",
-    button:
-      "border-emerald-200 text-emerald-700 hover:bg-emerald-100",
+    button: "border-emerald-200 text-emerald-700 hover:bg-emerald-100",
   },
 ];
 
@@ -49,9 +40,7 @@ function Board({ tasks }) {
       {/* Board toolbar */}
       <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-base font-bold text-slate-900">
-            Project tasks
-          </h2>
+          <h2 className="text-base font-bold text-slate-900">Project tasks</h2>
 
           <p className="mt-1 text-sm text-slate-500">
             Everything you need to get done, all in one place.
@@ -80,17 +69,9 @@ function Board({ tasks }) {
       {/* Kanban columns */}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-3">
         {columns.map((column) => {
-          const columnTasks = tasks.filter(
-            (task) => task.status === column.id
-          );
+          const columnTasks = tasks.filter((task) => task.status === column.id);
 
-          return (
-            <Column
-              key={column.id}
-              column={column}
-              tasks={columnTasks}
-            />
-          );
+          return <Column key={column.id} column={column} tasks={columnTasks} />;
         })}
       </div>
     </section>
