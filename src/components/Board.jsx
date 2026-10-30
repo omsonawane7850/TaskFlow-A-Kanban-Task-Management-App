@@ -34,19 +34,19 @@ const columns = [
   },
 ];
 
-function Board({ tasks }) {
+function Board({ tasks, onAddTask }) {
   return (
     <section>
-      {/* Board toolbar */}
+      {" "}
       <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
+        {" "}
         <div>
-          <h2 className="text-base font-bold text-slate-900">Project tasks</h2>
-
+          {" "}
+          <h2 className="text-base font-bold text-slate-900">Project tasks </h2>
           <p className="mt-1 text-sm text-slate-500">
             Everything you need to get done, all in one place.
           </p>
         </div>
-
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -65,13 +65,18 @@ function Board({ tasks }) {
           </button>
         </div>
       </div>
-
-      {/* Kanban columns */}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-3">
         {columns.map((column) => {
           const columnTasks = tasks.filter((task) => task.status === column.id);
 
-          return <Column key={column.id} column={column} tasks={columnTasks} />;
+          return (
+            <Column
+              key={column.id}
+              column={column}
+              tasks={columnTasks}
+              onAddTask={onAddTask}
+            />
+          );
         })}
       </div>
     </section>

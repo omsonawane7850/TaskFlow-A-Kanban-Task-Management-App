@@ -4,11 +4,14 @@ import { FiMenu } from "react-icons/fi";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Board from "./components/Board";
+import TaskModal from "./components/TaskModal";
+
 import initialTasks from "./data/initialTasks";
 
 function App() {
-  const [tasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState(initialTasks);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   const stats = {
     total: tasks.length,
@@ -17,10 +20,14 @@ function App() {
     done: tasks.filter((task) => task.status === "done").length,
   };
 
+  const handleCreateTask = (newTask) => {
+    setTasks((previousTasks) => [newTask, ...previousTasks]);
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F7FB] text-slate-800">
-      <Header />
-
+      {" "}
+      <Header onCreateTaskClick={() => setIsTaskModalOpen(true)} />
       <div className="mx-auto flex max-w-[1800px] items-start">
         <Sidebar
           stats={stats}
@@ -77,7 +84,7 @@ function App() {
             </div>
           </section>
 
-          <Board tasks={tasks} />
+          <Board tasks={tasks} onAddTask={() => setIsTaskModalOpen(true)} />
 
           <footer className="mt-10 border-t border-slate-200 py-5 text-center text-xs text-slate-400">
             Made for better teamwork with{" "}
@@ -85,6 +92,11 @@ function App() {
           </footer>
         </main>
       </div>
+      <TaskModal
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        onCreateTask={handleCreateTask}
+      />
     </div>
   );
 }

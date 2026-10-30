@@ -1,24 +1,20 @@
 import { FiPlus, FiMoreHorizontal } from "react-icons/fi";
 import TaskCard from "./TaskCard";
 
-function Column({ column, tasks }) {
-  const handleAddTask = () => {
-    window.dispatchEvent(new Event("taskflow:add-task"));
-  };
-
+function Column({ column, tasks, onAddTask }) {
   return (
     <section
       className={`min-w-0 overflow-hidden rounded-2xl border ${column.border} bg-white shadow-sm`}
     >
       {/* Column header */}
       <div className={`${column.headerBg} border-b ${column.border} p-4`}>
+        {" "}
         <div className="flex items-center justify-between gap-3">
+          {" "}
           <div className="flex items-center gap-2.5">
             <span className={`h-3 w-3 rounded-full ${column.dot}`} />
 
-            <h3 className="font-bold text-slate-800">
-              {column.title}
-            </h3>
+            <h3 className="font-bold text-slate-800">{column.title}</h3>
 
             <span
               className={`flex h-6 min-w-6 items-center justify-center rounded-lg px-1.5 text-xs font-bold ${column.countBg}`}
@@ -26,7 +22,6 @@ function Column({ column, tasks }) {
               {tasks.length}
             </span>
           </div>
-
           <button
             type="button"
             aria-label={`More options for ${column.title}`}
@@ -35,10 +30,7 @@ function Column({ column, tasks }) {
             <FiMoreHorizontal size={20} />
           </button>
         </div>
-
-        <p className="mt-2 pl-5 text-xs text-slate-500">
-          {column.subtitle}
-        </p>
+        <p className="mt-2 pl-5 text-xs text-slate-500">{column.subtitle}</p>
       </div>
 
       {/* Task cards */}
@@ -59,10 +51,9 @@ function Column({ column, tasks }) {
           </div>
         )}
 
-        {/* Add task button */}
         <button
           type="button"
-          onClick={handleAddTask}
+          onClick={() => onAddTask(column.id)}
           className={`flex w-full items-center justify-center gap-2 rounded-xl border border-dashed ${column.button} px-4 py-3 text-sm font-semibold transition`}
         >
           <FiPlus size={17} />
