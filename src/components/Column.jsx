@@ -1,65 +1,69 @@
-import { FiPlus, FiMoreHorizontal } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import TaskCard from "./TaskCard";
 
-function Column({ column, tasks, onAddTask }) {
+function Column({
+  column,
+  tasks,
+  onAddTask,
+  onEditTask,
+  onDeleteTask,
+}) {
   return (
-    <section
-      className={`min-w-0 overflow-hidden rounded-2xl border ${column.border} bg-white shadow-sm`}
-    >
+    <section className="min-w-0">
       {/* Column header */}
-      <div className={`${column.headerBg} border-b ${column.border} p-4`}>
-        {" "}
-        <div className="flex items-center justify-between gap-3">
-          {" "}
-          <div className="flex items-center gap-2.5">
-            <span className={`h-3 w-3 rounded-full ${column.dot}`} />
+      <div
+        className={`mb-4 rounded-xl border p-4 ${column.headerBg} ${column.border}`}
+      >
+        <div className="mb-1 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${column.dot}`} />
 
-            <h3 className="font-bold text-slate-800">{column.title}</h3>
-
-            <span
-              className={`flex h-6 min-w-6 items-center justify-center rounded-lg px-1.5 text-xs font-bold ${column.countBg}`}
-            >
-              {tasks.length}
-            </span>
+            <h2 className="font-semibold text-slate-800">
+              {column.title}
+            </h2>
           </div>
-          <button
-            type="button"
-            aria-label={`More options for ${column.title}`}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/80 hover:text-slate-700"
+
+          <span
+            className={`rounded-lg px-2.5 py-1 text-xs font-bold ${column.countBg}`}
           >
-            <FiMoreHorizontal size={20} />
-          </button>
+            {tasks.length}
+          </span>
         </div>
-        <p className="mt-2 pl-5 text-xs text-slate-500">{column.subtitle}</p>
+
+        <p className="text-xs text-slate-500">
+          {column.subtitle}
+        </p>
       </div>
 
-      {/* Task cards */}
-      <div className="space-y-3 bg-slate-50/70 p-3 sm:p-4">
+      {/* Tasks */}
+      <div className="space-y-3">
         {tasks.length > 0 ? (
           tasks.map((task) => (
-            <TaskCard key={task.id} task={task} column={column} />
+            <TaskCard
+              key={task.id}
+              task={task}
+              onEdit={onEditTask}
+              onDelete={onDeleteTask}
+            />
           ))
         ) : (
           <div className="rounded-xl border-2 border-dashed border-slate-200 px-4 py-8 text-center">
-            <p className="text-sm font-medium text-slate-400">
-              No tasks here yet
-            </p>
-
-            <p className="mt-1 text-xs text-slate-400">
-              Add a task to get started.
+            <p className="text-sm text-slate-400">
+              No tasks yet
             </p>
           </div>
         )}
-
-        <button
-          type="button"
-          onClick={() => onAddTask(column.id)}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl border border-dashed ${column.button} px-4 py-3 text-sm font-semibold transition`}
-        >
-          <FiPlus size={17} />
-          Add a task
-        </button>
       </div>
+
+      {/* Add task */}
+      <button
+        type="button"
+        onClick={() => onAddTask(column.id)}
+        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed py-3 text-sm font-medium transition ${column.button}`}
+      >
+        <FiPlus size={16} />
+        Add a task
+      </button>
     </section>
   );
 }

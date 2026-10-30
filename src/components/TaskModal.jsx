@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FiX, FiCalendar, FiFlag, FiTag } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FiX } from "react-icons/fi";
 
 const initialForm = {
   title: "",
@@ -10,9 +10,31 @@ const initialForm = {
   status: "todo",
 };
 
-function TaskModal({ isOpen, onClose, onCreateTask }) {
+function TaskModal({
+  isOpen,
+  onClose,
+  onCreateTask,
+  onUpdateTask,
+  taskToEdit,
+}) {
   const [formData, setFormData] = useState(initialForm);
-  const [error, setError] = useState("");
+
+  const isEditing = Boolean(taskToEdit);
+
+  useEffect(() => {
+    if (isOpen && taskToEdit) {
+      setFormData({
+        title: taskToEdit.title || "",
+        description: taskToEdit.description || "",
+        priority: taskToEdit.priority || "Medium",
+        category: taskToEdit.category || "Development",
+        dueDate: taskToEdit.dueDate || "",
+        status: taskToEdit.status || "todo",
+      });
+    } else if (isOpen) {
+      setFormData(initialForm);
+    }
+  }, [isOpen, taskToEdit]);
 
   if (!isOpen) {
     return null;
@@ -25,143 +47,134 @@ function TaskModal({ isOpen, onClose, onCreateTask }) {
       ...previous,
       [name]: value,
     }));
+  };
 
-    if (error) {
-      setError("");
-    }
+  const handleClose = () => {
+    setFormData(initialForm);
+    onClose();
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!formData.title.trim()) {
-      setError("Please enter a task title.");
+    const trimmedTitle = formData.title.trim();
+
+    if (!trimmedTitle) {
       return;
     }
 
-    onCreateTask({
-      id: crypto.randomUUID(),
-      title: formData.title.trim(),
+    const taskData = {
+      ...formData,
+      title: trimmedTitle,
       description: formData.description.trim(),
-      priority: formData.priority,
-      category: formData.category,
-      dueDate: formData.dueDate,
-      status: formData.status,
-    });
+    };
 
-    setFormData(initialForm);
-    setError("");
-    onClose();
-  };
+    if (isEditing) {
+      onUpdateTask({
+        ...taskToEdit,
+        ...taskData,
+      });
+    } else {
+      onCreateTask({
+        ...taskData,
+        id: crypto.randomUUID(),
+      });
+    }
 
-  const handleClose = () => {
-    setFormData(initialForm);
-    setError("");
-    onClose();
+    handleClose();
   };
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           handleClose();
         }
       }}
     >
-      {" "}
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="task-modal-title"
-        className="my-auto w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10"
-      >
-        {/* Modal header */}{" "}
-        <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
-          {" "}
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl">
+        {/* Modal header */}
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
-            {" "}
-            <h2
-              id="task-modal-title"
-              className="text-xl font-extrabold text-slate-900"
-            >
-              Create a task{" "}
+            <h2 className="text-xl font-bold text-slate-800">
+              {isEditing ? "Edit Task" : "Create New Task"}
             </h2>
+
             <p className="mt-1 text-sm text-slate-500">
-              Add a new task to your Kanban board.
+              {isEditing
+                ? "Update your task details."
+                : "Add a new task to your board."}
             </p>
           </div>
+
           <button
             type="button"
             onClick={handleClose}
-            aria-label="Close task form"
-            className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            aria-label="Close modal"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
           >
             <FiX size={20} />
           </button>
         </div>
+
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5 p-6">
-          {/* Title */}
           <div>
             <label
-              htmlFor="task-title"
-              className="mb-2 block text-sm font-semibold text-slate-700"
+              htmlFor="title"
+              className="mb-2 block text-sm font-medium text-slate-700"
             >
-              Task title <span className="text-rose-500">*</span>
+              Task title *
             </label>
 
             <input
-              id="task-title"
+              id="title"
               name="title"
               type="text"
               value={formData.title}
               onChange={handleChange}
-              placeholder="e.g. Build a login page"
-              maxLength={100}
+              placeholder="e.g. Build dashboard UI"
+              required
               autoFocus
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50"
             />
           </div>
 
-          {/* Description */}
           <div>
             <label
-              htmlFor="task-description"
-              className="mb-2 block text-sm font-semibold text-slate-700"
+              htmlFor="description"
+              className="mb-2 block text-sm font-medium text-slate-700"
             >
               Description
             </label>
 
             <textarea
-              id="task-description"
+              id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="What needs to be done?"
               rows={3}
-              maxLength={500}
-              className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50"
+              placeholder="What needs to be done?"
+              className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50"
             />
           </div>
 
-          {/* Priority and category */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
-                htmlFor="task-priority"
-                className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+                htmlFor="priority"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
-                <FiFlag className="text-rose-500" size={16} />
                 Priority
               </label>
 
               <select
-                id="task-priority"
+                id="priority"
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-indigo-400"
               >
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
@@ -171,98 +184,86 @@ function TaskModal({ isOpen, onClose, onCreateTask }) {
 
             <div>
               <label
-                htmlFor="task-category"
-                className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+                htmlFor="category"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
-                <FiTag className="text-violet-500" size={16} />
                 Category
               </label>
 
               <select
-                id="task-category"
+                id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-indigo-400"
               >
                 <option value="Development">Development</option>
                 <option value="Design">Design</option>
-                <option value="Research">Research</option>
+                <option value="Learning">Learning</option>
                 <option value="Planning">Planning</option>
-                <option value="Testing">Testing</option>
+                <option value="Personal">Personal</option>
               </select>
             </div>
-          </div>
 
-          {/* Due date and status */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
-                htmlFor="task-due-date"
-                className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+                htmlFor="dueDate"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
-                <FiCalendar className="text-blue-500" size={16} />
                 Due date
               </label>
 
               <input
-                id="task-due-date"
+                id="dueDate"
                 name="dueDate"
                 type="date"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-indigo-400"
               />
             </div>
 
             <div>
               <label
-                htmlFor="task-status"
-                className="mb-2 block text-sm font-semibold text-slate-700"
+                htmlFor="status"
+                className="mb-2 block text-sm font-medium text-slate-700"
               >
                 Status
               </label>
 
               <select
-                id="task-status"
+                id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-indigo-400"
               >
                 <option value="todo">To Do</option>
                 <option value="in-progress">In Progress</option>
-                <option value="done">Done</option>
+                <option value="done">Completed</option>
               </select>
             </div>
           </div>
 
-          {/* Validation error */}
-          {error && (
-            <p role="alert" className="text-sm font-medium text-rose-600">
-              {error}
-            </p>
-          )}
-
           {/* Actions */}
-          <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
+          <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+              className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 active:scale-[0.98]"
+              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
             >
-              Create Task
+              {isEditing ? "Save Changes" : "Create Task"}
             </button>
           </div>
         </form>
-      </section>
+      </div>
     </div>
   );
 }

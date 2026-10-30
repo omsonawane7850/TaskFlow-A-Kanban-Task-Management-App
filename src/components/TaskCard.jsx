@@ -1,116 +1,88 @@
 import {
   FiCalendar,
   FiMoreHorizontal,
+  FiEdit2,
+  FiTrash2,
   FiMessageSquare,
 } from "react-icons/fi";
 
-const priorityStyles = {
-  High: "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-100",
-  Medium:
-    "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-100",
-  Low: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-100",
-};
+function TaskCard({ task, onEdit, onDelete }) {
+  const priorityStyles = {
+    High: "bg-red-50 text-red-600",
+    Medium: "bg-amber-50 text-amber-600",
+    Low: "bg-emerald-50 text-emerald-600",
+  };
 
-const priorityDots = {
-  High: "bg-rose-500",
-  Medium: "bg-amber-500",
-  Low: "bg-emerald-500",
-};
+  const handleDelete = () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${task.title}"?`
+    );
 
-const categoryStyles = {
-  Design: "bg-violet-50 text-violet-700",
-  Development: "bg-sky-50 text-sky-700",
-};
-
-function TaskCard({ task, column }) {
-  const priorityClass =
-    priorityStyles[task.priority] || priorityStyles.Medium;
-
-  const priorityDot =
-    priorityDots[task.priority] || priorityDots.Medium;
-
-  const categoryClass =
-    categoryStyles[task.category] || "bg-slate-100 text-slate-600";
+    if (confirmed) {
+      onDelete(task.id);
+    }
+  };
 
   return (
-    <article className="group relative rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/60">
-      {/* Colored top accent */}
-      <div
-        className={`absolute left-0 top-4 h-8 w-1 rounded-r-full ${column.dot}`}
-      />
-
-      {/* Category and menu */}
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span
-          className={`rounded-md px-2.5 py-1 text-[11px] font-bold ${categoryClass}`}
-        >
+    <article className="group rounded-xl border border-slate-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      {/* Category and actions */}
+      <div className="mb-3 flex items-center justify-between">
+        <span className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600">
           {task.category}
         </span>
 
-        <button
-          type="button"
-          aria-label={`More options for ${task.title}`}
-          className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-        >
-          <FiMoreHorizontal size={19} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onEdit(task)}
+            aria-label={`Edit ${task.title}`}
+            title="Edit task"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-indigo-50 hover:text-indigo-600"
+          >
+            <FiEdit2 size={15} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            aria-label={`Delete ${task.title}`}
+            title="Delete task"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <FiTrash2 size={15} />
+          </button>
+        </div>
       </div>
 
-      {/* Title and description */}
-      <h4 className="text-[15px] font-bold leading-6 text-slate-800">
+      {/* Task details */}
+      <h3 className="mb-2 font-semibold text-slate-800">
         {task.title}
-      </h4>
+      </h3>
 
-      <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
-        {task.description}
+      <p className="mb-4 text-sm leading-6 text-slate-500">
+        {task.description || "No description provided."}
       </p>
 
-      {/* Priority */}
-      <div className="mt-4">
+      {/* Priority and due date */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
         <span
-          className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold ${priorityClass}`}
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${priorityDot}`} />
-
-          {task.priority} Priority
-        </span>
-      </div>
-
-      {/* Divider */}
-      <div className="my-4 border-t border-slate-100" />
-
-      {/* Due date and task status */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div
-          className={`flex items-center gap-1.5 text-xs font-medium ${
-            task.status === "done"
-              ? "text-emerald-600"
-              : "text-slate-500"
+          className={`rounded-md px-2.5 py-1 text-xs font-semibold ${
+            priorityStyles[task.priority] || priorityStyles.Medium
           }`}
         >
-          {task.status === "done" ? (
-            <>
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[10px]">
-                ✓
-              </span>
+          {task.priority}
+        </span>
 
-              Completed
-            </>
-          ) : (
-            <>
-              <FiCalendar size={14} />
-              <span>Due {task.dueDate}</span>
-            </>
-          )}
-        </div>
-
-        <div
-          className="flex items-center gap-1.5 text-xs text-slate-400"
-          title="Comments"
-        >
-          <FiMessageSquare size={14} />
-          <span>0</span>
-        </div>
+        {task.status === "done" ? (
+          <span className="text-xs font-medium text-emerald-600">
+            Completed
+          </span>
+        ) : task.dueDate ? (
+          <span className="flex items-center gap-1.5 text-xs text-slate-500">
+            <FiCalendar size={13} />
+            {task.dueDate}
+          </span>
+        ) : null}
       </div>
     </article>
   );

@@ -24,8 +24,8 @@ const columns = [
   },
   {
     id: "done",
-    title: "Done",
-    subtitle: "Look at you go!",
+    title: "Completed",
+    subtitle: "Look what you achieved",
     dot: "bg-emerald-500",
     headerBg: "bg-emerald-50",
     border: "border-emerald-100",
@@ -34,40 +34,42 @@ const columns = [
   },
 ];
 
-function Board({ tasks, onAddTask }) {
+function Board({
+  tasks,
+  onAddTask,
+  onEditTask,
+  onDeleteTask,
+}) {
   return (
-    <section>
-      {" "}
-      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
-        {" "}
+    <div>
+      {/* Board toolbar */}
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          {" "}
-          <h2 className="text-base font-bold text-slate-900">Project tasks </h2>
+          <h2 className="text-lg font-bold text-slate-800">
+            Your Tasks
+          </h2>
+
           <p className="mt-1 text-sm text-slate-500">
-            Everything you need to get done, all in one place.
+            Manage your work across all stages.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-          >
-            <FiFilter size={16} />
-            Filters
-          </button>
 
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-          >
-            All tasks
-            <FiChevronDown size={15} />
-          </button>
-        </div>
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+        >
+          <FiFilter size={15} />
+          Filter
+          <FiChevronDown size={14} />
+        </button>
       </div>
-      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-3">
+
+      {/* Kanban columns */}
+      <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-2 xl:grid-cols-3">
         {columns.map((column) => {
-          const columnTasks = tasks.filter((task) => task.status === column.id);
+          const columnTasks = tasks.filter(
+            (task) => task.status === column.id
+          );
 
           return (
             <Column
@@ -75,11 +77,13 @@ function Board({ tasks, onAddTask }) {
               column={column}
               tasks={columnTasks}
               onAddTask={onAddTask}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
             />
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }
 

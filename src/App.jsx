@@ -5,13 +5,13 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Board from "./components/Board";
 import TaskModal from "./components/TaskModal";
-
 import initialTasks from "./data/initialTasks";
 
 function App() {
   const [tasks, setTasks] = useState(initialTasks);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState(null);
 
   const stats = {
     total: tasks.length,
@@ -24,11 +24,42 @@ function App() {
     setTasks((previousTasks) => [newTask, ...previousTasks]);
   };
 
+  const handleEditTask = (task) => {
+    setTaskToEdit(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleUpdateTask = (updatedTask) => {
+    setTasks((previousTasks) =>
+      previousTasks.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+
+    setTaskToEdit(null);
+  };
+
+  const handleDeleteTask = (taskId) => {
+    setTasks((previousTasks) =>
+      previousTasks.filter((task) => task.id !== taskId)
+    );
+  };
+
+  const handleOpenCreateModal = () => {
+    setTaskToEdit(null);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleCloseTaskModal = () => {
+    setIsTaskModalOpen(false);
+    setTaskToEdit(null);
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F7FB] text-slate-800">
-      {" "}
-      <Header onCreateTaskClick={() => setIsTaskModalOpen(true)} />
-      <div className="mx-auto flex max-w-[1800px] items-start">
+      <Header onCreateTaskClick={handleOpenCreateModal} />
+
+      <div className="flex">
         <Sidebar
           stats={stats}
           isOpen={isSidebarOpen}
@@ -36,66 +67,70 @@ function App() {
         />
 
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
+          {/* Mobile menu */}
           <button
             type="button"
             onClick={() => setIsSidebarOpen(true)}
-            className="mb-5 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 lg:hidden"
+            aria-label="Open sidebar"
+            className="mb-5 rounded-lg border border-slate-200 bg-white p-2.5 text-slate-600 lg:hidden"
           >
-            <FiMenu size={18} />
-            Workspace menu
+            <FiMenu size={20} />
           </button>
 
-          <section className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          {/* Dashboard heading */}
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600">
-                <span className="h-2 w-2 rounded-full bg-blue-500" />
-                Workspace / Projects
-              </div>
+              <p className="mb-2 text-sm font-medium text-indigo-600">
+                Workspace / Overview
+              </p>
 
-              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 My Board
               </h1>
 
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                Organize your work. Stay focused. Get things done.
+              <p className="mt-2 text-sm text-slate-500">
+                Organize your work, focus on priorities, and get things done.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                <p className="text-xs font-medium text-slate-500">
-                  Total tasks
-                </p>
-
-                <p className="mt-1 text-xl font-extrabold text-slate-900">
-                  {stats.total.toString().padStart(2, "0")}
+            <div className="flex gap-3">
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                <p className="text-xs text-slate-500">Total tasks</p>
+                <p className="mt-1 text-xl font-bold text-slate-800">
+                  {stats.total}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
-                <p className="text-xs font-medium text-emerald-700">
-                  Completed
-                </p>
-
-                <p className="mt-1 text-xl font-extrabold text-emerald-700">
-                  {stats.done.toString().padStart(2, "0")}
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                <p className="text-xs text-slate-500">Completed</p>
+                <p className="mt-1 text-xl font-bold text-emerald-600">
+                  {stats.done}
                 </p>
               </div>
             </div>
-          </section>
+          </div>
 
-          <Board tasks={tasks} onAddTask={() => setIsTaskModalOpen(true)} />
+          {/* Kanban board */}
+          <Board
+            tasks={tasks}
+            onAddTask={handleOpenCreateModal}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
+          />
 
           <footer className="mt-10 border-t border-slate-200 py-5 text-center text-xs text-slate-400">
-            Made for better teamwork with{" "}
-            <span className="font-bold text-blue-600">TaskFlow</span>
+            TaskFlow — Make every task count.
           </footer>
         </main>
       </div>
+
+      {/* Create/Edit modal */}
       <TaskModal
         isOpen={isTaskModalOpen}
-        onClose={() => setIsTaskModalOpen(false)}
+        onClose={handleCloseTaskModal}
         onCreateTask={handleCreateTask}
+        onUpdateTask={handleUpdateTask}
+        taskToEdit={taskToEdit}
       />
     </div>
   );
