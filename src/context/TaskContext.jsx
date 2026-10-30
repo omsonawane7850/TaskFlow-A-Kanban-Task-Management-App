@@ -10,9 +10,35 @@ import initialTasks from "../data/initialTasks";
 const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
+  // Task state
   const [tasks, setTasks] = useState(initialTasks);
 
-  // Create a new task
+  // Dashboard UI state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState(null);
+
+  // Dashboard statistics
+  const stats = useMemo(
+    () => ({
+      total: tasks.length,
+
+      todo: tasks.filter(
+        (task) => task.status === "todo"
+      ).length,
+
+      progress: tasks.filter(
+        (task) => task.status === "in-progress"
+      ).length,
+
+      done: tasks.filter(
+        (task) => task.status === "done"
+      ).length,
+    }),
+    [tasks]
+  );
+
+  // Create task
   const addTask = (newTask) => {
     setTasks((previousTasks) => [
       newTask,
@@ -20,7 +46,7 @@ export function TaskProvider({ children }) {
     ]);
   };
 
-  // Update an existing task
+  // Update task
   const updateTask = (updatedTask) => {
     setTasks((previousTasks) =>
       previousTasks.map((task) =>
@@ -31,7 +57,7 @@ export function TaskProvider({ children }) {
     );
   };
 
-  // Delete a task
+  // Delete task
   const deleteTask = (taskId) => {
     setTasks((previousTasks) =>
       previousTasks.filter(
@@ -40,29 +66,50 @@ export function TaskProvider({ children }) {
     );
   };
 
-  // Calculate dashboard statistics
-  const stats = useMemo(
-    () => ({
-      total: tasks.length,
-      todo: tasks.filter(
-        (task) => task.status === "todo"
-      ).length,
-      progress: tasks.filter(
-        (task) => task.status === "in-progress"
-      ).length,
-      done: tasks.filter(
-        (task) => task.status === "done"
-      ).length,
-    }),
-    [tasks]
-  );
+  // Open create modal
+  const openCreateModal = () => {
+    setTaskToEdit(null);
+    setIsTaskModalOpen(true);
+  };
+
+  // Open edit modal
+  const openEditModal = (task) => {
+    setTaskToEdit(task);
+    setIsTaskModalOpen(true);
+  };
+
+  // Close modal
+  const closeTaskModal = () => {
+    setIsTaskModalOpen(false);
+    setTaskToEdit(null);
+  };
+
+  // Sidebar actions
+  const openSidebar = () => {
+    setIsSidebarOpen(true);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
 
   const value = {
     tasks,
     stats,
+
     addTask,
     updateTask,
     deleteTask,
+
+    isSidebarOpen,
+    openSidebar,
+    closeSidebar,
+
+    isTaskModalOpen,
+    taskToEdit,
+    openCreateModal,
+    openEditModal,
+    closeTaskModal,
   };
 
   return (

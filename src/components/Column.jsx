@@ -9,14 +9,16 @@ function Column({
   onDeleteTask,
 }) {
   return (
-    <section className="min-w-0">
+    <section className="flex w-full min-w-0 flex-col">
       {/* Column header */}
       <div
         className={`mb-4 rounded-xl border p-4 ${column.headerBg} ${column.border}`}
       >
-        <div className="mb-1 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`h-2.5 w-2.5 rounded-full ${column.dot}`} />
+        <div className="mb-1 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span
+              className={`h-2.5 w-2.5 shrink-0 rounded-full ${column.dot}`}
+            />
 
             <h2 className="font-semibold text-slate-800">
               {column.title}
@@ -24,19 +26,19 @@ function Column({
           </div>
 
           <span
-            className={`rounded-lg px-2.5 py-1 text-xs font-bold ${column.countBg}`}
+            className={`shrink-0 rounded-lg px-2.5 py-1 text-xs font-bold ${column.countBg}`}
           >
             {tasks.length}
           </span>
         </div>
 
-        <p className="text-xs text-slate-500">
+        <p className="text-sm text-slate-500">
           {column.subtitle}
         </p>
       </div>
 
-      {/* Tasks */}
-      <div className="space-y-3">
+      {/* Task cards */}
+      <div className="flex w-full min-w-0 flex-col gap-3">
         {tasks.length > 0 ? (
           tasks.map((task) => (
             <TaskCard
@@ -47,7 +49,7 @@ function Column({
             />
           ))
         ) : (
-          <div className="rounded-xl border-2 border-dashed border-slate-200 px-4 py-8 text-center">
+          <div className="w-full rounded-xl border-2 border-dashed border-slate-200 px-4 py-8 text-center">
             <p className="text-sm text-slate-400">
               No tasks yet
             </p>
@@ -58,7 +60,7 @@ function Column({
       {/* Add task */}
       <button
         type="button"
-        onClick={() => onAddTask(column.id)}
+        onClick={onAddTask}
         className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed py-3 text-sm font-medium transition ${column.button}`}
       >
         <FiPlus size={16} />

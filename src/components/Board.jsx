@@ -26,8 +26,8 @@ const columns = [
   },
   {
     id: "done",
-    title: "Completed",
-    subtitle: "Look what you achieved",
+    title: "Done",
+    subtitle: "Look at you go!",
     dot: "bg-emerald-500",
     headerBg: "bg-emerald-50",
     border: "border-emerald-100",
@@ -40,13 +40,11 @@ function Board({ onAddTask, onEditTask }) {
   const { tasks, deleteTask } = useTasks();
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       {/* Board toolbar */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-800">
-            Your Tasks
-          </h2>
+          <h2 className="text-lg font-bold text-slate-800">Your Tasks</h2>
 
           <p className="mt-1 text-sm text-slate-500">
             Manage your work across all stages.
@@ -64,21 +62,20 @@ function Board({ onAddTask, onEditTask }) {
       </div>
 
       {/* Kanban columns */}
-      <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 md:grid-cols-3">
         {columns.map((column) => {
-          const columnTasks = tasks.filter(
-            (task) => task.status === column.id
-          );
+          const columnTasks = tasks.filter((task) => task.status === column.id);
 
           return (
-            <Column
-              key={column.id}
-              column={column}
-              tasks={columnTasks}
-              onAddTask={onAddTask}
-              onEditTask={onEditTask}
-              onDeleteTask={deleteTask}
-            />
+            <div key={column.id} className="w-full min-w-0">
+              <Column
+                column={column}
+                tasks={columnTasks}
+                onAddTask={() => onAddTask(column.id)}
+                onEditTask={onEditTask}
+                onDeleteTask={deleteTask}
+              />
+            </div>
           );
         })}
       </div>
