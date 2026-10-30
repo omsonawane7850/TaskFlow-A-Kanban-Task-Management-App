@@ -1,5 +1,7 @@
 import { FiFilter, FiChevronDown } from "react-icons/fi";
+
 import Column from "./Column";
+import { useTasks } from "../context/TaskContext";
 
 const columns = [
   {
@@ -34,12 +36,9 @@ const columns = [
   },
 ];
 
-function Board({
-  tasks,
-  onAddTask,
-  onEditTask,
-  onDeleteTask,
-}) {
+function Board({ onAddTask, onEditTask }) {
+  const { tasks, deleteTask } = useTasks();
+
   return (
     <div>
       {/* Board toolbar */}
@@ -78,7 +77,7 @@ function Board({
               tasks={columnTasks}
               onAddTask={onAddTask}
               onEditTask={onEditTask}
-              onDeleteTask={onDeleteTask}
+              onDeleteTask={deleteTask}
             />
           );
         })}

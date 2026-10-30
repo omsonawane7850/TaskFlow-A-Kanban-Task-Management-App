@@ -5,44 +5,27 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Board from "./components/Board";
 import TaskModal from "./components/TaskModal";
-import initialTasks from "./data/initialTasks";
 
-function App() {
-  const [tasks, setTasks] = useState(initialTasks);
+import {
+  TaskProvider,
+  useTasks,
+} from "./context/TaskContext";
+
+function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
 
-  const stats = {
-    total: tasks.length,
-    todo: tasks.filter((task) => task.status === "todo").length,
-    progress: tasks.filter((task) => task.status === "in-progress").length,
-    done: tasks.filter((task) => task.status === "done").length,
-  };
-
-  const handleCreateTask = (newTask) => {
-    setTasks((previousTasks) => [newTask, ...previousTasks]);
-  };
+  const {
+    stats,
+    addTask,
+    updateTask,
+    deleteTask,
+  } = useTasks();
 
   const handleEditTask = (task) => {
     setTaskToEdit(task);
     setIsTaskModalOpen(true);
-  };
-
-  const handleUpdateTask = (updatedTask) => {
-    setTasks((previousTasks) =>
-      previousTasks.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
-
-    setTaskToEdit(null);
-  };
-
-  const handleDeleteTask = (taskId) => {
-    setTasks((previousTasks) =>
-      previousTasks.filter((task) => task.id !== taskId)
-    );
   };
 
   const handleOpenCreateModal = () => {
@@ -95,14 +78,20 @@ function App() {
 
             <div className="flex gap-3">
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                <p className="text-xs text-slate-500">Total tasks</p>
+                <p className="text-xs text-slate-500">
+                  Total tasks
+                </p>
+
                 <p className="mt-1 text-xl font-bold text-slate-800">
                   {stats.total}
                 </p>
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                <p className="text-xs text-slate-500">Completed</p>
+                <p className="text-xs text-slate-500">
+                  Completed
+                </p>
+
                 <p className="mt-1 text-xl font-bold text-emerald-600">
                   {stats.done}
                 </p>
@@ -112,10 +101,8 @@ function App() {
 
           {/* Kanban board */}
           <Board
-            tasks={tasks}
             onAddTask={handleOpenCreateModal}
             onEditTask={handleEditTask}
-            onDeleteTask={handleDeleteTask}
           />
 
           <footer className="mt-10 border-t border-slate-200 py-5 text-center text-xs text-slate-400">
@@ -128,11 +115,19 @@ function App() {
       <TaskModal
         isOpen={isTaskModalOpen}
         onClose={handleCloseTaskModal}
-        onCreateTask={handleCreateTask}
-        onUpdateTask={handleUpdateTask}
+        onCreateTask={addTask}
+        onUpdateTask={updateTask}
         taskToEdit={taskToEdit}
       />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <TaskProvider>
+      <Dashboard />
+    </TaskProvider>
   );
 }
 
