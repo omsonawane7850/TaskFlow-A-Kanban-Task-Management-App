@@ -1,17 +1,31 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import initialTasks from "../data/initialTasks";
 
 const TaskContext = createContext(null);
 
+const STORAGE_KEY = "taskflow-tasks-v2";
+
 export function TaskProvider({ children }) {
   // Task state
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState(() => {
+    try {
+      const savedTasks = localStorage.getItem(STORAGE_KEY);
+
+      if (savedTasks !== null) {
+        const parsed = JSON.parse(savedTasks);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (error) {
+      console.error("Failed to load tasks:", error);
+    }
+
+    return initialTasks;
+  });
+  // Save tasks to LocalStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }, [tasks]);
 
   // Dashboard UI state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,57 +37,42 @@ export function TaskProvider({ children }) {
     () => ({
       total: tasks.length,
 
-      todo: tasks.filter(
-        (task) => task.status === "todo"
-      ).length,
+      todo: tasks.filter((task) => task.status === "todo").length,
 
-      progress: tasks.filter(
-        (task) => task.status === "in-progress"
-      ).length,
+      progress: tasks.filter((task) => task.status === "in-progress").length,
 
-      done: tasks.filter(
-        (task) => task.status === "done"
-      ).length,
+      done: tasks.filter((task) => task.status === "done").length,
     }),
-    [tasks]
+    [tasks],
   );
 
   // Create task
   const addTask = (newTask) => {
-    setTasks((previousTasks) => [
-      newTask,
-      ...previousTasks,
-    ]);
+    setTasks((previousTasks) => [newTask, ...previousTasks]);
   };
 
   // Update task
   const updateTask = (updatedTask) => {
     setTasks((previousTasks) =>
       previousTasks.map((task) =>
-        task.id === updatedTask.id
-          ? updatedTask
-          : task
-      )
+        task.id === updatedTask.id ? updatedTask : task,
+      ),
     );
   };
 
   // Delete task
   const deleteTask = (taskId) => {
     setTasks((previousTasks) =>
-      previousTasks.filter(
-        (task) => task.id !== taskId
-      )
+      previousTasks.filter((task) => task.id !== taskId),
     );
   };
 
-  // NEW: Move task between Kanban columns
+  // Move task between Kanban columns
   const moveTask = (taskId, newStatus) => {
     setTasks((previousTasks) =>
       previousTasks.map((task) =>
-        task.id === taskId
-          ? { ...task, status: newStatus }
-          : task
-      )
+        task.id === taskId ? { ...task, status: newStatus } : task,
+      ),
     );
   };
 
@@ -124,20 +123,14 @@ export function TaskProvider({ children }) {
     closeTaskModal,
   };
 
-  return (
-    <TaskContext.Provider value={value}>
-      {children}
-    </TaskContext.Provider>
-  );
+  return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
 }
 
 export function useTasks() {
   const context = useContext(TaskContext);
 
   if (!context) {
-    throw new Error(
-      "useTasks must be used inside TaskProvider"
-    );
+    throw new Error("useTasks must be used inside TaskProvider");
   }
 
   return context;
