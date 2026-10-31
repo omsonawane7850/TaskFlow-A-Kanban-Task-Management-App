@@ -12,26 +12,16 @@ import {
   FiMove,
 } from "react-icons/fi";
 
-function TaskCard({
-  task,
-  onEdit,
-  onDelete,
-  isDragOverlay = false,
-}) {
+function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuRef = useRef(null);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: task.id,
-    disabled: isDragOverlay,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: task.id,
+      disabled: isDragOverlay,
+    });
 
   const dragStyle =
     transform && !isDragOverlay
@@ -71,12 +61,10 @@ function TaskCard({
     done: "bg-emerald-500",
   };
 
-  const priority =
-    priorityStyles[task.priority] || priorityStyles.Medium;
+  const priority = priorityStyles[task.priority] || priorityStyles.Medium;
 
   const category =
-    categoryStyles[task.category] ||
-    "bg-slate-100 text-slate-700";
+    categoryStyles[task.category] || "bg-slate-100 text-slate-700";
 
   // Format date from YYYY-MM-DD into Oct 30, 2026
   const formatDate = (dateString) => {
@@ -103,10 +91,7 @@ function TaskCard({
   // Close menu when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
     };
@@ -114,16 +99,13 @@ function TaskCard({
     document.addEventListener("mousedown", handleOutsideClick);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleOutsideClick
-      );
+      document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, []);
 
   const handleDelete = () => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${task.title}"?`
+      `Are you sure you want to delete "${task.title}"?`,
     );
 
     setIsMenuOpen(false);
@@ -143,20 +125,14 @@ function TaskCard({
       ref={setNodeRef}
       style={dragStyle}
       {...attributes}
+      {...listeners}
       className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-        isDragOverlay
-          ? "cursor-grabbing"
-          : "cursor-grab active:cursor-grabbing"
-      } ${
-        isDragging && !isDragOverlay
-          ? "z-10 opacity-30"
-          : ""
-      }`}
+        isDragOverlay ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing"
+      } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
     >
       {/* Drag handle */}
       <div
-        {...listeners}
-        className="absolute right-12 top-6 z-10 flex cursor-grab items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 active:cursor-grabbing"
+        className="absolute right-12 top-6 z-10 flex items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500"
         title="Drag task to another column"
         aria-label={`Drag ${task.title}`}
       >
@@ -232,10 +208,7 @@ function TaskCard({
         <span
           className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${priority.badge}`}
         >
-          <span
-            className={`h-2 w-2 rounded-full ${priority.dot}`}
-          />
-
+          <span className={`h-2 w-2 rounded-full ${priority.dot}`} />
           {task.priority} Priority
         </span>
       </div>
@@ -247,21 +220,16 @@ function TaskCard({
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100">
               <FiCheck size={15} />
             </span>
-
             Completed
           </span>
         ) : task.dueDate ? (
           <span className="inline-flex items-center gap-2 text-sm text-slate-500">
             <FiCalendar size={19} />
 
-            <span>
-              Due {formatDate(task.dueDate)}
-            </span>
+            <span>Due {formatDate(task.dueDate)}</span>
           </span>
         ) : (
-          <span className="text-sm text-slate-400">
-            No due date
-          </span>
+          <span className="text-sm text-slate-400">No due date</span>
         )}
 
         <span
