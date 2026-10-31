@@ -4,17 +4,24 @@ import initialTasks from "../data/initialTasks";
 
 const TaskContext = createContext(null);
 
-const STORAGE_KEY = "taskflow-tasks-v2";
+const STORAGE_KEY = "taskflow-custom-tasks";
+
+// initialTasks ke ids: inhe localStorage mein kabhi save nahi karenge
+const initialIds = new Set(initialTasks.map((task) => task.id));
 
 export function TaskProvider({ children }) {
-  // Task state
+  // Task state: user ke saved tasks + hamesha seedha import kiye hue initialTasks
   const [tasks, setTasks] = useState(() => {
     try {
-      const savedTasks = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY);
 
-      if (savedTasks !== null) {
-        const parsed = JSON.parse(savedTasks);
-        if (Array.isArray(parsed)) return parsed;
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+          const customTasks = parsed.filter((task) => !initialIds.has(task.id));
+          return [...customTasks, ...initialTasks];
+        }
       }
     } catch (error) {
       console.error("Failed to load tasks:", error);
@@ -22,9 +29,15 @@ export function TaskProvider({ children }) {
 
     return initialTasks;
   });
-  // Save tasks to LocalStorage
+
+  // Sirf user-created tasks LocalStorage mein save honge
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    try {
+      const customTasks = tasks.filter((task) => !initialIds.has(task.id));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customTasks));
+    } catch (error) {
+      console.error("Failed to save tasks:", error);
+    }
   }, [tasks]);
 
   // Dashboard UI state
