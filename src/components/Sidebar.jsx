@@ -43,9 +43,7 @@ function Sidebar({ stats, isOpen, onClose }) {
       >
         {/* Mobile sidebar header */}
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 lg:hidden">
-          <span className="font-bold text-slate-800">
-            Workspace
-          </span>
+          <span className="font-bold text-slate-800">Workspace</span>
 
           <button
             type="button"
@@ -153,26 +151,14 @@ function Sidebar({ stats, isOpen, onClose }) {
         {/* Upgrade card */}
         <div className="border-t border-slate-100 p-5">
           <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 p-4 text-white">
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-white/20">
-              <FiZap size={19} />
-            </div>
-
-            <h3 className="text-sm font-bold">
-              Stay on track!
-            </h3>
-
-            <p className="mt-1 text-xs leading-5 text-blue-100">
-              Keep your tasks organized and make every day productive.
-            </p>
+            <p className="text-xs leading-1 text-blue-100">Progress Bar -</p>
 
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/20">
               <div
                 className="h-full rounded-full bg-white"
                 style={{
                   width: `${
-                    stats.total > 0
-                      ? (stats.done / stats.total) * 100
-                      : 0
+                    stats.total > 0 ? (stats.done / stats.total) * 100 : 0
                   }%`,
                 }}
               />

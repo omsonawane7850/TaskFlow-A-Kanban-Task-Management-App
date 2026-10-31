@@ -66,6 +66,17 @@ export function TaskProvider({ children }) {
     );
   };
 
+  // NEW: Move task between Kanban columns
+  const moveTask = (taskId, newStatus) => {
+    setTasks((previousTasks) =>
+      previousTasks.map((task) =>
+        task.id === taskId
+          ? { ...task, status: newStatus }
+          : task
+      )
+    );
+  };
+
   // Open create modal
   const openCreateModal = () => {
     setTaskToEdit(null);
@@ -100,6 +111,7 @@ export function TaskProvider({ children }) {
     addTask,
     updateTask,
     deleteTask,
+    moveTask,
 
     isSidebarOpen,
     openSidebar,

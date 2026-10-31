@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useDraggable } from "@dnd-kit/core";
+
 import {
   FiCalendar,
   FiMoreHorizontal,
@@ -7,11 +9,36 @@ import {
   FiTrash2,
   FiMessageSquare,
   FiCheck,
+  FiMove,
 } from "react-icons/fi";
 
-function TaskCard({ task, onEdit, onDelete }) {
+function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+  isDragOverlay = false,
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const menuRef = useRef(null);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: task.id,
+    disabled: isDragOverlay,
+  });
+
+  const dragStyle =
+    transform && !isDragOverlay
+      ? {
+          transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        }
+      : undefined;
 
   const priorityStyles = {
     High: {
@@ -112,7 +139,30 @@ function TaskCard({ task, onEdit, onDelete }) {
   };
 
   return (
-    <article className="relative overflow-visible rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <article
+      ref={setNodeRef}
+      style={dragStyle}
+      {...attributes}
+      className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+        isDragOverlay
+          ? "cursor-grabbing"
+          : "cursor-grab active:cursor-grabbing"
+      } ${
+        isDragging && !isDragOverlay
+          ? "z-10 opacity-30"
+          : ""
+      }`}
+    >
+      {/* Drag handle */}
+      <div
+        {...listeners}
+        className="absolute right-12 top-6 z-10 flex cursor-grab items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 active:cursor-grabbing"
+        title="Drag task to another column"
+        aria-label={`Drag ${task.title}`}
+      >
+        <FiMove size={15} />
+      </div>
+
       {/* Colored status strip */}
       <span
         className={`absolute bottom-auto left-0 top-6 h-10 w-1.5 rounded-r-full ${
@@ -134,7 +184,11 @@ function TaskCard({ task, onEdit, onDelete }) {
             aria-label={`Task options for ${task.title}`}
             aria-expanded={isMenuOpen}
             title="Task options"
-            onClick={() => setIsMenuOpen((open) => !open)}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              setIsMenuOpen((open) => !open);
+            }}
             className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
           >
             <FiMoreHorizontal size={22} />

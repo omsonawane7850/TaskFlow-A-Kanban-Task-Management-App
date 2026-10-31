@@ -1,4 +1,6 @@
+import { useDroppable } from "@dnd-kit/core";
 import { FiPlus } from "react-icons/fi";
+
 import TaskCard from "./TaskCard";
 
 function Column({
@@ -8,8 +10,17 @@ function Column({
   onEditTask,
   onDeleteTask,
 }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: column.id,
+  });
+
   return (
-    <section className="flex w-full min-w-0 flex-col">
+    <section
+      ref={setNodeRef}
+      className={`flex w-full min-w-0 flex-col rounded-xl transition-colors ${
+        isOver ? "bg-blue-50/50" : ""
+      }`}
+    >
       {/* Column header */}
       <div
         className={`mb-4 rounded-xl border p-4 ${column.headerBg} ${column.border}`}
@@ -49,9 +60,15 @@ function Column({
             />
           ))
         ) : (
-          <div className="w-full rounded-xl border-2 border-dashed border-slate-200 px-4 py-8 text-center">
+          <div
+            className={`flex min-h-36 w-full items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center ${
+              isOver
+                ? "border-blue-300 bg-blue-50"
+                : "border-slate-200"
+            }`}
+          >
             <p className="text-sm text-slate-400">
-              No tasks yet
+              {isOver ? "Drop task here" : "No tasks yet"}
             </p>
           </div>
         )}

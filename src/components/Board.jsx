@@ -1,6 +1,19 @@
+import { useState } from "react";
+
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  pointerWithin,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+
 import { FiFilter, FiChevronDown } from "react-icons/fi";
 
 import Column from "./Column";
+import TaskCard from "./TaskCard";
+
 import { useTasks } from "../context/TaskContext";
 
 const columns = [
@@ -37,20 +50,79 @@ const columns = [
 ];
 
 function Board({ onAddTask, onEditTask }) {
-  const { tasks, deleteTask } = useTasks();
+  const { tasks, deleteTask, moveTask } = useTasks();
+
+  const [activeTask, setActiveTask] = useState(null);
+
+  // Configure drag sensor
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
+  // When dragging starts
+  const handleDragStart = ({ active }) => {
+    const selectedTask = tasks.find(
+      (task) => String(task.id) === String(active.id),
+    );
+
+    setActiveTask(selectedTask || null);
+  };
+
+  // When a task is dropped
+  const handleDragEnd = ({ active, over }) => {
+    setActiveTask(null);
+
+    if (!over) {
+      return;
+    }
+
+    const draggedTask = tasks.find(
+      (task) => String(task.id) === String(active.id),
+    );
+
+    if (!draggedTask) {
+      return;
+    }
+
+    // Identify the destination column
+    const targetColumn = columns.find(
+      (column) => column.id === String(over.id),
+    );
+
+    if (!targetColumn) {
+      console.log("Drop target:", over.id);
+      return;
+    }
+
+    // Don't update if the task stays in the same column
+    if (draggedTask.status === targetColumn.id) {
+      return;
+    }
+
+    // Update the task's status
+    moveTask(draggedTask.id, targetColumn.id);
+  };
+
+  const handleDragCancel = () => {
+    setActiveTask(null);
+  };
 
   return (
     <div className="w-full min-w-0">
-      {/* Board toolbar */}
+      {/* Board toolbar */}{" "}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        {" "}
         <div>
-          <h2 className="text-lg font-bold text-slate-800">Your Tasks</h2>
-
+          {" "}
+          <h2 className="text-lg font-bold text-slate-800">Your Tasks </h2>
           <p className="mt-1 text-sm text-slate-500">
             Manage your work across all stages.
           </p>
         </div>
-
         <button
           type="button"
           className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
@@ -60,25 +132,49 @@ function Board({ onAddTask, onEditTask }) {
           <FiChevronDown size={14} />
         </button>
       </div>
+      {/* Drag-and-drop board */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={pointerWithin}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        {/* Kanban columns */}
+        <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 md:grid-cols-3">
+          {columns.map((column) => {
+            const columnTasks = tasks.filter(
+              (task) => task.status === column.id,
+            );
 
-      {/* Kanban columns */}
-      <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 md:grid-cols-3">
-        {columns.map((column) => {
-          const columnTasks = tasks.filter((task) => task.status === column.id);
+            return (
+              <div key={column.id} className="w-full min-w-0">
+                <Column
+                  column={column}
+                  tasks={columnTasks}
+                  onAddTask={() => onAddTask(column.id)}
+                  onEditTask={onEditTask}
+                  onDeleteTask={deleteTask}
+                />
+              </div>
+            );
+          })}
+        </div>
 
-          return (
-            <div key={column.id} className="w-full min-w-0">
-              <Column
-                column={column}
-                tasks={columnTasks}
-                onAddTask={() => onAddTask(column.id)}
-                onEditTask={onEditTask}
-                onDeleteTask={deleteTask}
+        {/* Drag preview */}
+        <DragOverlay>
+          {activeTask ? (
+            <div className="rotate-2 cursor-grabbing opacity-95 shadow-2xl">
+              <TaskCard
+                task={activeTask}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                isDragOverlay
               />
             </div>
-          );
-        })}
-      </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }
