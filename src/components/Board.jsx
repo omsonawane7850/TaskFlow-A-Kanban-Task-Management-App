@@ -9,7 +9,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 
-import { FiFilter, FiChevronDown } from "react-icons/fi";
+import { FiFilter, FiChevronDown, FiX } from "react-icons/fi";
 
 import Column from "./Column";
 import TaskCard from "./TaskCard";
@@ -49,6 +49,12 @@ const columns = [
   },
 ];
 
+const priorityOrder = {
+  High: 1,
+  Medium: 2,
+  Low: 3,
+};
+
 function Board({ onAddTask, onEditTask }) {
   const {
     tasks,
@@ -61,7 +67,56 @@ function Board({ onAddTask, onEditTask }) {
 
   const [activeTask, setActiveTask] = useState(null);
 
+  // Filter and sorting states
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("default");
+
   const isSearching = searchQuery.trim().length > 0;
+
+  const hasActiveFilters = priorityFilter !== "all" || categoryFilter !== "all";
+
+  const hasActiveControls = hasActiveFilters || sortBy !== "default";
+
+  // Apply filters and sorting
+  const visibleTasks = [...filteredTasks]
+    .filter((task) => {
+      const matchesPriority =
+        priorityFilter === "all" || task.priority === priorityFilter;
+
+      const matchesCategory =
+        categoryFilter === "all" || task.category === categoryFilter;
+
+      return matchesPriority && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sortBy === "priority") {
+        return (
+          (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4)
+        );
+      }
+
+      if (sortBy === "title") {
+        return a.title.localeCompare(b.title);
+      }
+
+      if (sortBy === "dueDate") {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      }
+
+      return 0;
+    });
+
+  // Clear all filters and sorting
+  const handleClearFilters = () => {
+    setPriorityFilter("all");
+    setCategoryFilter("all");
+    setSortBy("default");
+  };
 
   // Configure drag sensor
   const sensors = useSensors(
@@ -133,21 +188,140 @@ function Board({ onAddTask, onEditTask }) {
 
         <button
           type="button"
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+          onClick={() => setIsFilterOpen((previous) => !previous)}
+          aria-expanded={isFilterOpen}
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+            hasActiveControls
+              ? "border-blue-200 bg-blue-50 text-blue-700"
+              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+          }`}
         >
           <FiFilter size={15} />
-          Filter
-          <FiChevronDown size={14} />
+          Filter & Sort
+          {hasActiveControls && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
+              !
+            </span>
+          )}
+          <FiChevronDown
+            size={14}
+            className={`transition-transform ${
+              isFilterOpen ? "rotate-180" : ""
+            }`}
+          />
         </button>
       </div>
+
+      {/* Filter and sorting panel */}
+      {isFilterOpen && (
+        <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-semibold text-slate-800">
+              Filter & Sort Tasks
+            </h3>
+
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen(false)}
+              aria-label="Close filters"
+              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              <FiX size={18} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {/* Priority filter */}
+            <div>
+              <label
+                htmlFor="priorityFilter"
+                className="mb-2 block text-sm font-medium text-slate-600"
+              >
+                Priority
+              </label>
+
+              <select
+                id="priorityFilter"
+                value={priorityFilter}
+                onChange={(event) => setPriorityFilter(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+              >
+                <option value="all">All Priorities</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+
+            {/* Category filter */}
+            <div>
+              <label
+                htmlFor="categoryFilter"
+                className="mb-2 block text-sm font-medium text-slate-600"
+              >
+                Category
+              </label>
+
+              <select
+                id="categoryFilter"
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+              >
+                <option value="all">All Categories</option>
+                <option value="Development">Development</option>
+                <option value="Design">Design</option>
+                <option value="Learning">Learning</option>
+                <option value="Planning">Planning</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </div>
+
+            {/* Sorting */}
+            <div>
+              <label
+                htmlFor="sortBy"
+                className="mb-2 block text-sm font-medium text-slate-600"
+              >
+                Sort By
+              </label>
+
+              <select
+                id="sortBy"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+              >
+                <option value="default">Default Order</option>
+                <option value="priority">Priority (High to Low)</option>
+                <option value="dueDate">Due Date (Earliest First)</option>
+                <option value="title">Title (A to Z)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Clear filters */}
+          {hasActiveControls && (
+            <div className="mt-4 flex justify-end border-t border-slate-100 pt-3">
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="text-sm font-semibold text-blue-600 transition hover:text-blue-700"
+              >
+                Clear Filters & Sorting
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Search result summary */}
       {isSearching && (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
           <p className="min-w-0 break-words">
-            {filteredTasks.length === 0
+            {visibleTasks.length === 0
               ? `No tasks match "${searchQuery.trim()}"`
-              : `Showing ${filteredTasks.length} of ${tasks.length} tasks for "${searchQuery.trim()}"`}
+              : `Showing ${visibleTasks.length} of ${tasks.length} tasks for "${searchQuery.trim()}"`}
           </p>
 
           <button
@@ -171,7 +345,7 @@ function Board({ onAddTask, onEditTask }) {
         {/* Kanban columns */}
         <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 md:grid-cols-3">
           {columns.map((column) => {
-            const columnTasks = filteredTasks.filter(
+            const columnTasks = visibleTasks.filter(
               (task) => task.status === column.id,
             );
 
@@ -180,7 +354,7 @@ function Board({ onAddTask, onEditTask }) {
                 <Column
                   column={column}
                   tasks={columnTasks}
-                  isSearching={isSearching}
+                  isSearching={isSearching || hasActiveControls}
                   onAddTask={() => onAddTask(column.id)}
                   onEditTask={onEditTask}
                   onDeleteTask={deleteTask}
