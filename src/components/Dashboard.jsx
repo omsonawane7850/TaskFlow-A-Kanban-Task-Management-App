@@ -31,10 +31,10 @@ function Dashboard() {
   } = useTasks();
 
   return (
-    <div className="min-h-screen bg-[#F5F7FB] text-slate-800">
+    <div className="min-h-screen overflow-x-hidden bg-[#F5F7FB] text-slate-800">
       <Header onCreateTaskClick={openCreateModal} />
 
-      <div className="flex">
+      <div className="flex min-h-[calc(100vh-73px)]">
         <Sidebar stats={stats} isOpen={isSidebarOpen} onClose={closeSidebar} />
 
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
@@ -43,14 +43,14 @@ function Dashboard() {
             type="button"
             onClick={openSidebar}
             aria-label="Open sidebar"
-            className="mb-5 rounded-lg border border-slate-200 bg-white p-2.5 text-slate-600 lg:hidden"
+            className="mb-4 rounded-lg border border-slate-200 bg-white p-2.5 text-slate-600 transition hover:bg-slate-50 lg:hidden"
           >
             <FiMenu size={20} />
           </button>
 
           {/* Dashboard heading */}
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
+          <div className="mb-7 flex flex-col gap-5 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
               <p className="mb-2 text-sm font-medium text-indigo-600">
                 Workspace / Overview
               </p>
@@ -59,13 +59,14 @@ function Dashboard() {
                 My Board
               </h1>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
                 Organize your work, focus on priorities, and get things done.
               </p>
             </div>
 
-            <div className="flex gap-3">
-              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+            {/* Dashboard statistics */}
+            <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:min-w-[240px]">
+              <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 sm:px-4">
                 <p className="text-xs text-slate-500">Total tasks</p>
 
                 <p className="mt-1 text-xl font-bold text-slate-800">
@@ -73,7 +74,7 @@ function Dashboard() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+              <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 sm:px-4">
                 <p className="text-xs text-slate-500">Completed</p>
 
                 <p className="mt-1 text-xl font-bold text-emerald-600">
@@ -86,7 +87,7 @@ function Dashboard() {
           {/* Kanban board */}
           <Board onAddTask={openCreateModal} onEditTask={openEditModal} />
 
-          <footer className="mt-10 border-t border-slate-200 py-5 text-center text-xs text-slate-400">
+          <footer className="mt-8 border-t border-slate-200 py-5 text-center text-xs text-slate-400 sm:mt-10">
             TaskFlow — Make every task count.
           </footer>
         </main>

@@ -69,7 +69,6 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
   const category =
     categoryStyles[task.category] || "bg-slate-100 text-slate-700";
 
-  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return "";
 
@@ -90,7 +89,6 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
     });
   };
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -105,19 +103,16 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
     };
   }, []);
 
-  // Open delete confirmation
   const handleDelete = () => {
     setIsMenuOpen(false);
     setIsConfirmOpen(true);
   };
 
-  // Confirm delete
   const confirmDelete = () => {
     onDelete(task.id);
     setIsConfirmOpen(false);
   };
 
-  // Cancel delete
   const cancelDelete = () => {
     setIsConfirmOpen(false);
   };
@@ -134,7 +129,7 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         style={dragStyle}
         {...attributes}
         {...listeners}
-        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5 ${
           isDragOverlay
             ? "cursor-grabbing"
             : "cursor-grab active:cursor-grabbing"
@@ -142,7 +137,7 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
       >
         {/* Drag handle */}
         <div
-          className="absolute right-12 top-6 z-10 flex items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500"
+          className="absolute right-11 top-5 z-10 flex items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 sm:right-12 sm:top-6"
           title="Drag task to another column"
           aria-label={`Drag ${task.title}`}
         >
@@ -151,15 +146,15 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
 
         {/* Status strip */}
         <span
-          className={`absolute bottom-auto left-0 top-6 h-10 w-1.5 rounded-r-full ${
+          className={`absolute bottom-auto left-0 top-5 h-9 w-1.5 rounded-r-full sm:top-6 sm:h-10 ${
             statusAccent[task.status] || "bg-blue-500"
           }`}
         />
 
         {/* Category and actions */}
-        <div className="mb-5 flex items-center justify-between gap-3">
+        <div className="mb-4 flex items-center justify-between gap-2 sm:mb-5 sm:gap-3">
           <span
-            className={`rounded-lg px-3 py-2 text-sm font-semibold ${category}`}
+            className={`max-w-[75%] truncate rounded-lg px-2.5 py-1.5 text-xs font-semibold sm:px-3 sm:py-2 sm:text-sm ${category}`}
           >
             {task.category}
           </span>
@@ -205,47 +200,49 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         </div>
 
         {/* Task details */}
-        <h3 className="mb-3 break-words text-lg font-bold leading-7 text-slate-800">
+        <h3 className="mb-2 break-words text-base font-bold leading-6 text-slate-800 sm:mb-3 sm:text-lg sm:leading-7">
           {task.title}
         </h3>
 
-        <p className="mb-6 whitespace-pre-line break-words text-sm leading-7 text-slate-500">
+        <p className="mb-5 whitespace-pre-line break-words text-sm leading-6 text-slate-500 sm:mb-6 sm:leading-7">
           {task.description || "No description provided."}
         </p>
 
         {/* Priority */}
-        <div className="mb-5">
+        <div className="mb-4 sm:mb-5">
           <span
-            className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${priority.badge}`}
+            className={`inline-flex items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium sm:px-3 sm:text-sm ${priority.badge}`}
           >
-            <span className={`h-2 w-2 rounded-full ${priority.dot}`} />
+            <span className={`h-2 w-2 shrink-0 rounded-full ${priority.dot}`} />
             {task.priority} Priority
           </span>
         </div>
 
         {/* Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 sm:pt-4">
           {task.status === "done" ? (
-            <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600">
+            <span className="inline-flex items-center gap-2 text-xs font-medium text-emerald-600 sm:text-sm">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100">
                 <FiCheck size={15} />
               </span>
               Completed
             </span>
           ) : task.dueDate ? (
-            <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-              <FiCalendar size={19} />
+            <span className="inline-flex items-center gap-2 text-xs text-slate-500 sm:text-sm">
+              <FiCalendar size={17} />
               <span>Due {formatDate(task.dueDate)}</span>
             </span>
           ) : (
-            <span className="text-sm text-slate-400">No due date</span>
+            <span className="text-xs text-slate-400 sm:text-sm">
+              No due date
+            </span>
           )}
 
           <span
-            className="inline-flex items-center gap-2 text-sm text-slate-400"
+            className="inline-flex items-center gap-2 text-xs text-slate-400 sm:text-sm"
             title="Comments"
           >
-            <FiMessageSquare size={19} />
+            <FiMessageSquare size={17} />
             <span>0</span>
           </span>
         </div>

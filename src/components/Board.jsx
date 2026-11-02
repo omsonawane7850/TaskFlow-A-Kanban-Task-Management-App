@@ -67,7 +67,6 @@ function Board({ onAddTask, onEditTask }) {
 
   const [activeTask, setActiveTask] = useState(null);
 
-  // Filter and sorting states
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -79,7 +78,6 @@ function Board({ onAddTask, onEditTask }) {
 
   const hasActiveControls = hasActiveFilters || sortBy !== "default";
 
-  // Apply filters and sorting
   const visibleTasks = [...filteredTasks]
     .filter((task) => {
       const matchesPriority =
@@ -111,14 +109,12 @@ function Board({ onAddTask, onEditTask }) {
       return 0;
     });
 
-  // Clear all filters and sorting
   const handleClearFilters = () => {
     setPriorityFilter("all");
     setCategoryFilter("all");
     setSortBy("default");
   };
 
-  // Configure drag sensor
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -127,7 +123,6 @@ function Board({ onAddTask, onEditTask }) {
     }),
   );
 
-  // When dragging starts
   const handleDragStart = ({ active }) => {
     const selectedTask = tasks.find(
       (task) => String(task.id) === String(active.id),
@@ -136,37 +131,25 @@ function Board({ onAddTask, onEditTask }) {
     setActiveTask(selectedTask || null);
   };
 
-  // When a task is dropped
   const handleDragEnd = ({ active, over }) => {
     setActiveTask(null);
 
-    if (!over) {
-      return;
-    }
+    if (!over) return;
 
     const draggedTask = tasks.find(
       (task) => String(task.id) === String(active.id),
     );
 
-    if (!draggedTask) {
-      return;
-    }
+    if (!draggedTask) return;
 
-    // Identify the destination column
     const targetColumn = columns.find(
       (column) => column.id === String(over.id),
     );
 
-    if (!targetColumn) {
-      return;
-    }
+    if (!targetColumn) return;
 
-    // Don't update if the task stays in the same column
-    if (draggedTask.status === targetColumn.id) {
-      return;
-    }
+    if (draggedTask.status === targetColumn.id) return;
 
-    // Update the task's status
     moveTask(draggedTask.id, targetColumn.id);
   };
 
@@ -230,8 +213,7 @@ function Board({ onAddTask, onEditTask }) {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {/* Priority filter */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <div>
               <label
                 htmlFor="priorityFilter"
@@ -253,7 +235,6 @@ function Board({ onAddTask, onEditTask }) {
               </select>
             </div>
 
-            {/* Category filter */}
             <div>
               <label
                 htmlFor="categoryFilter"
@@ -277,7 +258,6 @@ function Board({ onAddTask, onEditTask }) {
               </select>
             </div>
 
-            {/* Sorting */}
             <div>
               <label
                 htmlFor="sortBy"
@@ -300,7 +280,6 @@ function Board({ onAddTask, onEditTask }) {
             </div>
           </div>
 
-          {/* Clear filters */}
           {hasActiveControls && (
             <div className="mt-4 flex justify-end border-t border-slate-100 pt-3">
               <button
@@ -342,15 +321,18 @@ function Board({ onAddTask, onEditTask }) {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        {/* Kanban columns */}
-        <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 md:grid-cols-3">
+        {/* Responsive Kanban columns */}
+        <div className="flex w-full min-w-0 items-start gap-4 overflow-x-auto pb-4 snap-x snap-mandatory sm:gap-5 xl:grid xl:grid-cols-3 xl:overflow-visible xl:pb-0">
           {columns.map((column) => {
             const columnTasks = visibleTasks.filter(
               (task) => task.status === column.id,
             );
 
             return (
-              <div key={column.id} className="w-full min-w-0">
+              <div
+                key={column.id}
+                className="w-[min(88vw,360px)] min-w-[280px] max-w-[360px] shrink-0 snap-start xl:w-full xl:min-w-0 xl:max-w-none"
+              >
                 <Column
                   column={column}
                   tasks={columnTasks}
