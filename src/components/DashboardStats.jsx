@@ -1,9 +1,4 @@
-import {
-  FiLayers,
-  FiCircle,
-  FiClock,
-  FiCheckCircle,
-} from "react-icons/fi";
+import { FiLayers, FiCircle, FiClock, FiCheckCircle } from "react-icons/fi";
 
 const statItems = [
   {
@@ -60,9 +55,7 @@ function DashboardStats({ stats }) {
             </div>
 
             <span className="ml-2 text-sm font-bold text-slate-800">
-              {(stats[item.key] ?? 0)
-                .toString()
-                .padStart(2, "0")}
+              {(stats[item.key] ?? 0).toString().padStart(2, "0")}
             </span>
           </div>
         );

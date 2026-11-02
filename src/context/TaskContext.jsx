@@ -6,11 +6,9 @@ const TaskContext = createContext(null);
 
 const STORAGE_KEY = "taskflow-custom-tasks";
 
-// initialTasks ke ids: inhe localStorage mein kabhi save nahi karenge
 const initialIds = new Set(initialTasks.map((task) => task.id));
 
 export function TaskProvider({ children }) {
-  // Task state: user ke saved tasks + hamesha seedha import kiye hue initialTasks
   const [tasks, setTasks] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -20,6 +18,7 @@ export function TaskProvider({ children }) {
 
         if (Array.isArray(parsed)) {
           const customTasks = parsed.filter((task) => !initialIds.has(task.id));
+
           return [...customTasks, ...initialTasks];
         }
       }
@@ -30,10 +29,11 @@ export function TaskProvider({ children }) {
     return initialTasks;
   });
 
-  // Sirf user-created tasks LocalStorage mein save honge
+  // LocalStorage persistence
   useEffect(() => {
     try {
       const customTasks = tasks.filter((task) => !initialIds.has(task.id));
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(customTasks));
     } catch (error) {
       console.error("Failed to save tasks:", error);
@@ -45,10 +45,26 @@ export function TaskProvider({ children }) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
 
-  // Search state (UI state: persist nahi hota)
+  // Toast state
+  const [toast, setToast] = useState(null);
+
+  const showToast = (title, message, type = "success") => {
+    setToast({
+      id: Date.now(),
+      title,
+      message,
+      type,
+    });
+  };
+
+  const hideToast = () => {
+    setToast(null);
+  };
+
+  // Search state
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Search ke baad dikhne wale tasks
+  // Search filtering
   const filteredTasks = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -63,15 +79,12 @@ export function TaskProvider({ children }) {
     );
   }, [tasks, searchQuery]);
 
-  // Dashboard statistics (hamesha poori list se, filtered se nahi)
+  // Dashboard statistics
   const stats = useMemo(
     () => ({
       total: tasks.length,
-
       todo: tasks.filter((task) => task.status === "todo").length,
-
       progress: tasks.filter((task) => task.status === "in-progress").length,
-
       done: tasks.filter((task) => task.status === "done").length,
     }),
     [tasks],
@@ -80,6 +93,11 @@ export function TaskProvider({ children }) {
   // Create task
   const addTask = (newTask) => {
     setTasks((previousTasks) => [newTask, ...previousTasks]);
+
+    showToast(
+      "Task created",
+      `"${newTask.title}" has been added successfully.`,
+    );
   };
 
   // Update task
@@ -89,21 +107,47 @@ export function TaskProvider({ children }) {
         task.id === updatedTask.id ? updatedTask : task,
       ),
     );
+
+    showToast(
+      "Task updated",
+      `"${updatedTask.title}" has been updated successfully.`,
+    );
   };
 
   // Delete task
   const deleteTask = (taskId) => {
+    const taskToDelete = tasks.find((task) => task.id === taskId);
+
     setTasks((previousTasks) =>
       previousTasks.filter((task) => task.id !== taskId),
     );
+
+    if (taskToDelete) {
+      showToast("Task deleted", `"${taskToDelete.title}" has been deleted.`);
+    }
   };
 
   // Move task between Kanban columns
   const moveTask = (taskId, newStatus) => {
+    const task = tasks.find((item) => item.id === taskId);
+
+    if (!task || task.status === newStatus) return;
+
     setTasks((previousTasks) =>
-      previousTasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task,
+      previousTasks.map((item) =>
+        item.id === taskId ? { ...item, status: newStatus } : item,
       ),
+    );
+
+    const statusLabels = {
+      todo: "To Do",
+      "in-progress": "In Progress",
+      done: "Completed",
+    };
+
+    showToast(
+      "Task moved",
+      `"${task.title}" moved to ${statusLabels[newStatus] || newStatus}.`,
     );
   };
 
@@ -152,6 +196,10 @@ export function TaskProvider({ children }) {
     updateTask,
     deleteTask,
     moveTask,
+
+    toast,
+    showToast,
+    hideToast,
 
     isSidebarOpen,
     openSidebar,

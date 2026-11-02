@@ -12,15 +12,18 @@ import {
   FiMove,
 } from "react-icons/fi";
 
+import ConfirmDialog from "./ConfirmDialog";
+
 function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const menuRef = useRef(null);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: task.id,
-      disabled: isDragOverlay,
+      disabled: isDragOverlay || isConfirmOpen,
     });
 
   const dragStyle =
@@ -66,11 +69,10 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
   const category =
     categoryStyles[task.category] || "bg-slate-100 text-slate-700";
 
-  // Format date from YYYY-MM-DD into Oct 30, 2026
+  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return "";
 
-    // Handle existing dates such as "Oct 30, 2026"
     if (dateString.includes(",")) {
       return dateString;
     }
@@ -103,16 +105,21 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
     };
   }, []);
 
+  // Open delete confirmation
   const handleDelete = () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${task.title}"?`,
-    );
-
     setIsMenuOpen(false);
+    setIsConfirmOpen(true);
+  };
 
-    if (confirmed) {
-      onDelete(task.id);
-    }
+  // Confirm delete
+  const confirmDelete = () => {
+    onDelete(task.id);
+    setIsConfirmOpen(false);
+  };
+
+  // Cancel delete
+  const cancelDelete = () => {
+    setIsConfirmOpen(false);
   };
 
   const handleEdit = () => {
@@ -121,126 +128,138 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
   };
 
   return (
-    <article
-      ref={setNodeRef}
-      style={dragStyle}
-      {...attributes}
-      {...listeners}
-      className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-        isDragOverlay ? "cursor-grabbing" : "cursor-grab active:cursor-grabbing"
-      } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
-    >
-      {/* Drag handle */}
-      <div
-        className="absolute right-12 top-6 z-10 flex items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500"
-        title="Drag task to another column"
-        aria-label={`Drag ${task.title}`}
+    <>
+      <article
+        ref={setNodeRef}
+        style={dragStyle}
+        {...attributes}
+        {...listeners}
+        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+          isDragOverlay
+            ? "cursor-grabbing"
+            : "cursor-grab active:cursor-grabbing"
+        } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
       >
-        <FiMove size={15} />
-      </div>
-
-      {/* Colored status strip */}
-      <span
-        className={`absolute bottom-auto left-0 top-6 h-10 w-1.5 rounded-r-full ${
-          statusAccent[task.status] || "bg-blue-500"
-        }`}
-      />
-
-      {/* Category and actions */}
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <span
-          className={`rounded-lg px-3 py-2 text-sm font-semibold ${category}`}
+        {/* Drag handle */}
+        <div
+          className="absolute right-12 top-6 z-10 flex items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500"
+          title="Drag task to another column"
+          aria-label={`Drag ${task.title}`}
         >
-          {task.category}
-        </span>
-
-        <div className="relative" ref={menuRef}>
-          <button
-            type="button"
-            aria-label={`Task options for ${task.title}`}
-            aria-expanded={isMenuOpen}
-            title="Task options"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.stopPropagation();
-              setIsMenuOpen((open) => !open);
-            }}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-          >
-            <FiMoreHorizontal size={22} />
-          </button>
-
-          {isMenuOpen && (
-            <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
-              <button
-                type="button"
-                onClick={handleEdit}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
-              >
-                <FiEdit2 size={15} />
-                Edit task
-              </button>
-
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600"
-              >
-                <FiTrash2 size={15} />
-                Delete task
-              </button>
-            </div>
-          )}
+          <FiMove size={15} />
         </div>
-      </div>
 
-      {/* Task details */}
-      <h3 className="mb-3 break-words text-lg font-bold leading-7 text-slate-800">
-        {task.title}
-      </h3>
-
-      <p className="mb-6 whitespace-pre-line break-words text-sm leading-7 text-slate-500">
-        {task.description || "No description provided."}
-      </p>
-
-      {/* Priority */}
-      <div className="mb-5">
+        {/* Status strip */}
         <span
-          className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${priority.badge}`}
-        >
-          <span className={`h-2 w-2 rounded-full ${priority.dot}`} />
-          {task.priority} Priority
-        </span>
-      </div>
+          className={`absolute bottom-auto left-0 top-6 h-10 w-1.5 rounded-r-full ${
+            statusAccent[task.status] || "bg-blue-500"
+          }`}
+        />
 
-      {/* Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-        {task.status === "done" ? (
-          <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100">
-              <FiCheck size={15} />
+        {/* Category and actions */}
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <span
+            className={`rounded-lg px-3 py-2 text-sm font-semibold ${category}`}
+          >
+            {task.category}
+          </span>
+
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              aria-label={`Task options for ${task.title}`}
+              aria-expanded={isMenuOpen}
+              title="Task options"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsMenuOpen((open) => !open);
+              }}
+              className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              <FiMoreHorizontal size={22} />
+            </button>
+
+            {isMenuOpen && (
+              <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
+                >
+                  <FiEdit2 size={15} />
+                  Edit task
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <FiTrash2 size={15} />
+                  Delete task
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Task details */}
+        <h3 className="mb-3 break-words text-lg font-bold leading-7 text-slate-800">
+          {task.title}
+        </h3>
+
+        <p className="mb-6 whitespace-pre-line break-words text-sm leading-7 text-slate-500">
+          {task.description || "No description provided."}
+        </p>
+
+        {/* Priority */}
+        <div className="mb-5">
+          <span
+            className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${priority.badge}`}
+          >
+            <span className={`h-2 w-2 rounded-full ${priority.dot}`} />
+            {task.priority} Priority
+          </span>
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+          {task.status === "done" ? (
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100">
+                <FiCheck size={15} />
+              </span>
+              Completed
             </span>
-            Completed
-          </span>
-        ) : task.dueDate ? (
-          <span className="inline-flex items-center gap-2 text-sm text-slate-500">
-            <FiCalendar size={19} />
+          ) : task.dueDate ? (
+            <span className="inline-flex items-center gap-2 text-sm text-slate-500">
+              <FiCalendar size={19} />
+              <span>Due {formatDate(task.dueDate)}</span>
+            </span>
+          ) : (
+            <span className="text-sm text-slate-400">No due date</span>
+          )}
 
-            <span>Due {formatDate(task.dueDate)}</span>
+          <span
+            className="inline-flex items-center gap-2 text-sm text-slate-400"
+            title="Comments"
+          >
+            <FiMessageSquare size={19} />
+            <span>0</span>
           </span>
-        ) : (
-          <span className="text-sm text-slate-400">No due date</span>
-        )}
+        </div>
+      </article>
 
-        <span
-          className="inline-flex items-center gap-2 text-sm text-slate-400"
-          title="Comments"
-        >
-          <FiMessageSquare size={19} />
-          <span>0</span>
-        </span>
-      </div>
-    </article>
+      {/* Delete confirmation dialog */}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Delete task?"
+        message={`Are you sure you want to delete "${task.title}"? This action cannot be undone.`}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+      />
+    </>
   );
 }
 

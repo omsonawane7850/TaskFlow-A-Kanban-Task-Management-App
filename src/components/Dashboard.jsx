@@ -4,6 +4,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Board from "./Board";
 import TaskModal from "./TaskModal";
+import Toast from "./Toast";
 
 import { useTasks } from "../context/TaskContext";
 
@@ -24,6 +25,9 @@ function Dashboard() {
     openCreateModal,
     openEditModal,
     closeTaskModal,
+
+    toast,
+    hideToast,
   } = useTasks();
 
   return (
@@ -32,6 +36,7 @@ function Dashboard() {
 
       <div className="flex">
         <Sidebar stats={stats} isOpen={isSidebarOpen} onClose={closeSidebar} />
+
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
           {/* Mobile menu */}
           <button
@@ -95,6 +100,9 @@ function Dashboard() {
         onUpdateTask={updateTask}
         taskToEdit={taskToEdit}
       />
+
+      {/* Toast notification */}
+      <Toast toast={toast} onClose={hideToast} />
     </div>
   );
 }
