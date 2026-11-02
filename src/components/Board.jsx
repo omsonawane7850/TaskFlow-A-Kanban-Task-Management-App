@@ -50,9 +50,18 @@ const columns = [
 ];
 
 function Board({ onAddTask, onEditTask }) {
-  const { tasks, deleteTask, moveTask } = useTasks();
+  const {
+    tasks,
+    filteredTasks,
+    searchQuery,
+    clearSearch,
+    deleteTask,
+    moveTask,
+  } = useTasks();
 
   const [activeTask, setActiveTask] = useState(null);
+
+  const isSearching = searchQuery.trim().length > 0;
 
   // Configure drag sensor
   const sensors = useSensors(
@@ -94,7 +103,6 @@ function Board({ onAddTask, onEditTask }) {
     );
 
     if (!targetColumn) {
-      console.log("Drop target:", over.id);
       return;
     }
 
@@ -113,16 +121,16 @@ function Board({ onAddTask, onEditTask }) {
 
   return (
     <div className="w-full min-w-0">
-      {/* Board toolbar */}{" "}
+      {/* Board toolbar */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        {" "}
         <div>
-          {" "}
-          <h2 className="text-lg font-bold text-slate-800">Your Tasks </h2>
+          <h2 className="text-lg font-bold text-slate-800">Your Tasks</h2>
+
           <p className="mt-1 text-sm text-slate-500">
             Manage your work across all stages.
           </p>
         </div>
+
         <button
           type="button"
           className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
@@ -132,6 +140,26 @@ function Board({ onAddTask, onEditTask }) {
           <FiChevronDown size={14} />
         </button>
       </div>
+
+      {/* Search result summary */}
+      {isSearching && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
+          <p className="min-w-0 break-words">
+            {filteredTasks.length === 0
+              ? `No tasks match "${searchQuery.trim()}"`
+              : `Showing ${filteredTasks.length} of ${tasks.length} tasks for "${searchQuery.trim()}"`}
+          </p>
+
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="shrink-0 font-semibold underline-offset-2 hover:underline"
+          >
+            Clear search
+          </button>
+        </div>
+      )}
+
       {/* Drag-and-drop board */}
       <DndContext
         sensors={sensors}
@@ -143,7 +171,7 @@ function Board({ onAddTask, onEditTask }) {
         {/* Kanban columns */}
         <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 md:grid-cols-3">
           {columns.map((column) => {
-            const columnTasks = tasks.filter(
+            const columnTasks = filteredTasks.filter(
               (task) => task.status === column.id,
             );
 
@@ -152,6 +180,7 @@ function Board({ onAddTask, onEditTask }) {
                 <Column
                   column={column}
                   tasks={columnTasks}
+                  isSearching={isSearching}
                   onAddTask={() => onAddTask(column.id)}
                   onEditTask={onEditTask}
                   onDeleteTask={deleteTask}

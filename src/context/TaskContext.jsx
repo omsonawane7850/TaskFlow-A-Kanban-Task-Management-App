@@ -45,7 +45,25 @@ export function TaskProvider({ children }) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
 
-  // Dashboard statistics
+  // Search state (UI state: persist nahi hota)
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Search ke baad dikhne wale tasks
+  const filteredTasks = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return tasks;
+    }
+
+    return tasks.filter((task) =>
+      [task.title, task.description, task.category].some((field) =>
+        (field || "").toLowerCase().includes(query),
+      ),
+    );
+  }, [tasks, searchQuery]);
+
+  // Dashboard statistics (hamesha poori list se, filtered se nahi)
   const stats = useMemo(
     () => ({
       total: tasks.length,
@@ -89,6 +107,11 @@ export function TaskProvider({ children }) {
     );
   };
 
+  // Search actions
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
+
   // Open create modal
   const openCreateModal = () => {
     setTaskToEdit(null);
@@ -118,7 +141,12 @@ export function TaskProvider({ children }) {
 
   const value = {
     tasks,
+    filteredTasks,
     stats,
+
+    searchQuery,
+    setSearchQuery,
+    clearSearch,
 
     addTask,
     updateTask,

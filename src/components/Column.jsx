@@ -6,6 +6,7 @@ import TaskCard from "./TaskCard";
 function Column({
   column,
   tasks,
+  isSearching = false,
   onAddTask,
   onEditTask,
   onDeleteTask,
@@ -13,6 +14,12 @@ function Column({
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   });
+
+  const emptyText = isOver
+    ? "Drop task here"
+    : isSearching
+      ? "No matching tasks"
+      : "No tasks yet";
 
   return (
     <section
@@ -31,9 +38,7 @@ function Column({
               className={`h-2.5 w-2.5 shrink-0 rounded-full ${column.dot}`}
             />
 
-            <h2 className="font-semibold text-slate-800">
-              {column.title}
-            </h2>
+            <h2 className="font-semibold text-slate-800">{column.title}</h2>
           </div>
 
           <span
@@ -43,9 +48,7 @@ function Column({
           </span>
         </div>
 
-        <p className="text-sm text-slate-500">
-          {column.subtitle}
-        </p>
+        <p className="text-sm text-slate-500">{column.subtitle}</p>
       </div>
 
       {/* Task cards */}
@@ -62,14 +65,10 @@ function Column({
         ) : (
           <div
             className={`flex min-h-36 w-full items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center ${
-              isOver
-                ? "border-blue-300 bg-blue-50"
-                : "border-slate-200"
+              isOver ? "border-blue-300 bg-blue-50" : "border-slate-200"
             }`}
           >
-            <p className="text-sm text-slate-400">
-              {isOver ? "Drop task here" : "No tasks yet"}
-            </p>
+            <p className="text-sm text-slate-400">{emptyText}</p>
           </div>
         )}
       </div>
