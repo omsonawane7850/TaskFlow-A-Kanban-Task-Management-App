@@ -6,6 +6,7 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
+  MeasuringStrategy,
   pointerWithin,
   closestCenter,
   useSensor,
@@ -354,8 +355,23 @@ function Board({ onAddTask, onEditTask }) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
+        // Slower, edge-only autoscroll so one column doesn't get skipped
+        autoScroll={{
+          threshold: { x: 0.1, y: 0.15 },
+          acceleration: 3,
+          interval: 10,
+        }}
+        // Re-measure columns continuously while the board scrolls under the finger
+        measuring={{
+          droppable: { strategy: MeasuringStrategy.Always },
+        }}
       >
-        <div className="w-full min-w-0 overflow-x-auto pb-4 snap-x snap-mandatory md:overflow-visible md:pb-0">
+        <div
+          className={`w-full min-w-0 overflow-x-auto pb-4 md:overflow-visible md:pb-0 ${
+            // Snap fights autoscroll during drag, so disable it while dragging
+            activeTask ? "" : "snap-x snap-mandatory"
+          }`}
+        >
           <div className="flex w-max min-w-full items-start gap-4 md:grid md:w-full md:grid-cols-3 md:gap-3 lg:gap-4">
             {columns.map((column) => {
               const columnTasks = visibleTasks.filter(
@@ -365,7 +381,7 @@ function Board({ onAddTask, onEditTask }) {
               return (
                 <div
                   key={column.id}
-                  className="w-[min(88vw,360px)] min-w-[280px] shrink-0 snap-start md:w-full md:min-w-0"
+                  className="w-[min(78vw,340px)] min-w-[260px] shrink-0 snap-start md:w-full md:min-w-0"
                 >
                   <Column
                     column={column}
