@@ -20,11 +20,17 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
 
   const menuRef = useRef(null);
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: task.id,
-      disabled: isDragOverlay || isConfirmOpen,
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: task.id,
+    disabled: isDragOverlay || isConfirmOpen,
+  });
 
   const dragStyle =
     transform && !isDragOverlay
@@ -127,22 +133,24 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
       <article
         ref={setNodeRef}
         style={dragStyle}
-        {...attributes}
-        {...listeners}
         className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-3 lg:p-4 ${
-          isDragOverlay
-            ? "cursor-grabbing"
-            : "cursor-grab active:cursor-grabbing"
+          isDragOverlay ? "cursor-grabbing" : "cursor-default"
         } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
       >
         {/* Drag handle */}
-        <div
-          className="absolute right-11 top-4 z-10 flex items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 lg:right-12 lg:top-5"
+        <button
+          ref={setActivatorNodeRef}
+          type="button"
+          {...attributes}
+          {...listeners}
+          disabled={isDragOverlay || isConfirmOpen}
           title="Drag task to another column"
           aria-label={`Drag ${task.title}`}
+          onClick={(event) => event.stopPropagation()}
+          className="absolute right-11 top-4 z-10 flex cursor-grab touch-none items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 active:cursor-grabbing lg:right-12 lg:top-5"
         >
           <FiMove size={15} />
-        </div>
+        </button>
 
         {/* Status strip */}
         <span

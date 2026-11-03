@@ -3,7 +3,9 @@ import { useState } from "react";
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
   pointerWithin,
   useSensor,
   useSensors,
@@ -115,12 +117,22 @@ function Board({ onAddTask, onEditTask }) {
     setSortBy("default");
   };
 
+  // Mouse, touch and keyboard sensors
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 5,
       },
     }),
+
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 8,
+      },
+    }),
+
+    useSensor(KeyboardSensor),
   );
 
   const handleDragStart = ({ active }) => {
