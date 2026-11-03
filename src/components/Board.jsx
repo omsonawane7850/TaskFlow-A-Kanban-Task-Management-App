@@ -7,6 +7,7 @@ import {
   TouchSensor,
   KeyboardSensor,
   pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -80,6 +81,7 @@ function Board({ onAddTask, onEditTask }) {
 
   const hasActiveControls = hasActiveFilters || sortBy !== "default";
 
+  // Filter and sort tasks
   const visibleTasks = [...filteredTasks]
     .filter((task) => {
       const matchesPriority =
@@ -111,6 +113,7 @@ function Board({ onAddTask, onEditTask }) {
       return 0;
     });
 
+  // Clear filters
   const handleClearFilters = () => {
     setPriorityFilter("all");
     setCategoryFilter("all");
@@ -135,6 +138,18 @@ function Board({ onAddTask, onEditTask }) {
     useSensor(KeyboardSensor),
   );
 
+  // Mobile-friendly collision detection
+  const handleCollisionDetection = (args) => {
+    const pointerCollisions = pointerWithin(args);
+
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions;
+    }
+
+    return rectIntersection(args);
+  };
+
+  // Drag start
   const handleDragStart = ({ active }) => {
     const selectedTask = tasks.find(
       (task) => String(task.id) === String(active.id),
@@ -143,6 +158,7 @@ function Board({ onAddTask, onEditTask }) {
     setActiveTask(selectedTask || null);
   };
 
+  // Drag end
   const handleDragEnd = ({ active, over }) => {
     setActiveTask(null);
 
@@ -165,6 +181,7 @@ function Board({ onAddTask, onEditTask }) {
     moveTask(draggedTask.id, targetColumn.id);
   };
 
+  // Drag cancel
   const handleDragCancel = () => {
     setActiveTask(null);
   };
@@ -325,10 +342,10 @@ function Board({ onAddTask, onEditTask }) {
         </div>
       )}
 
-      {/* Drag-and-drop board */}
+      {/* Drag and drop board */}
       <DndContext
         sensors={sensors}
-        collisionDetection={pointerWithin}
+        collisionDetection={handleCollisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
