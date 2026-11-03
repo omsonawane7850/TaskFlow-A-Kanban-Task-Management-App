@@ -322,17 +322,14 @@ function Board({ onAddTask, onEditTask }) {
         onDragCancel={handleDragCancel}
       >
         {/* Responsive Kanban columns */}
-        <div className="flex w-full min-w-0 items-start gap-4 overflow-x-auto pb-4 snap-x snap-mandatory sm:gap-5 xl:grid xl:grid-cols-3 xl:overflow-visible xl:pb-0">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5">
           {columns.map((column) => {
             const columnTasks = visibleTasks.filter(
               (task) => task.status === column.id,
             );
 
             return (
-              <div
-                key={column.id}
-                className="w-[min(88vw,360px)] min-w-[280px] max-w-[360px] shrink-0 snap-start xl:w-full xl:min-w-0 xl:max-w-none"
-              >
+              <div key={column.id} className="w-full min-w-0">
                 <Column
                   column={column}
                   tasks={columnTasks}

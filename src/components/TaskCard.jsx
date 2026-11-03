@@ -38,12 +38,10 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
       badge: "border border-rose-100 bg-rose-50 text-rose-600",
       dot: "bg-rose-500",
     },
-
     Medium: {
       badge: "border border-amber-100 bg-amber-50 text-amber-600",
       dot: "bg-amber-500",
     },
-
     Low: {
       badge: "border border-emerald-100 bg-emerald-50 text-emerald-600",
       dot: "bg-emerald-500",
