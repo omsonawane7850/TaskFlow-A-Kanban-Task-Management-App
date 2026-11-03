@@ -7,7 +7,7 @@ import {
   TouchSensor,
   KeyboardSensor,
   pointerWithin,
-  rectIntersection,
+  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -120,7 +120,7 @@ function Board({ onAddTask, onEditTask }) {
     setSortBy("default");
   };
 
-  // Mouse, touch and keyboard sensors
+  // Sensors
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -138,15 +138,20 @@ function Board({ onAddTask, onEditTask }) {
     useSensor(KeyboardSensor),
   );
 
-  // Mobile-friendly collision detection
+  // Collision detection: use actual pointer position
   const handleCollisionDetection = (args) => {
-    const pointerCollisions = pointerWithin(args);
+    const collisions = pointerWithin(args);
 
-    if (pointerCollisions.length > 0) {
-      return pointerCollisions;
+    if (collisions.length > 0) {
+      return collisions;
     }
 
-    return rectIntersection(args);
+    // Keyboard drag fallback only
+    if (!args.pointerCoordinates) {
+      return closestCenter(args);
+    }
+
+    return [];
   };
 
   // Drag start
@@ -224,7 +229,7 @@ function Board({ onAddTask, onEditTask }) {
         </button>
       </div>
 
-      {/* Filter and sorting panel */}
+      {/* Filter panel */}
       {isFilterOpen && (
         <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
@@ -323,7 +328,7 @@ function Board({ onAddTask, onEditTask }) {
         </div>
       )}
 
-      {/* Search result summary */}
+      {/* Search summary */}
       {isSearching && (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
           <p className="min-w-0 break-words">
@@ -342,7 +347,7 @@ function Board({ onAddTask, onEditTask }) {
         </div>
       )}
 
-      {/* Drag and drop board */}
+      {/* Kanban board */}
       <DndContext
         sensors={sensors}
         collisionDetection={handleCollisionDetection}
@@ -350,7 +355,6 @@ function Board({ onAddTask, onEditTask }) {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        {/* Responsive Kanban columns */}
         <div className="w-full min-w-0 overflow-x-auto pb-4 snap-x snap-mandatory md:overflow-visible md:pb-0">
           <div className="flex w-max min-w-full items-start gap-4 md:grid md:w-full md:grid-cols-3 md:gap-3 lg:gap-4">
             {columns.map((column) => {
