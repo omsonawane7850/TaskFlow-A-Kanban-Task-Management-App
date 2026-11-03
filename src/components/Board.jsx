@@ -322,25 +322,30 @@ function Board({ onAddTask, onEditTask }) {
         onDragCancel={handleDragCancel}
       >
         {/* Responsive Kanban columns */}
-        <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5">
-          {columns.map((column) => {
-            const columnTasks = visibleTasks.filter(
-              (task) => task.status === column.id,
-            );
+        <div className="w-full min-w-0 overflow-x-auto pb-4 snap-x snap-mandatory md:overflow-visible md:pb-0">
+          <div className="flex w-max min-w-full items-start gap-4 md:grid md:w-full md:grid-cols-3 md:gap-3 lg:gap-4">
+            {columns.map((column) => {
+              const columnTasks = visibleTasks.filter(
+                (task) => task.status === column.id,
+              );
 
-            return (
-              <div key={column.id} className="w-full min-w-0">
-                <Column
-                  column={column}
-                  tasks={columnTasks}
-                  isSearching={isSearching || hasActiveControls}
-                  onAddTask={() => onAddTask(column.id)}
-                  onEditTask={onEditTask}
-                  onDeleteTask={deleteTask}
-                />
-              </div>
-            );
-          })}
+              return (
+                <div
+                  key={column.id}
+                  className="w-[min(88vw,360px)] min-w-[280px] shrink-0 snap-start md:w-full md:min-w-0"
+                >
+                  <Column
+                    column={column}
+                    tasks={columnTasks}
+                    isSearching={isSearching || hasActiveControls}
+                    onAddTask={() => onAddTask(column.id)}
+                    onEditTask={onEditTask}
+                    onDeleteTask={deleteTask}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Drag preview */}
