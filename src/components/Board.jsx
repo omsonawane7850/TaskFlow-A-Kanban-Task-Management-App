@@ -358,8 +358,8 @@ function Board({ onAddTask, onEditTask }) {
         // Slower, edge-only autoscroll so one column doesn't get skipped
         autoScroll={{
           threshold: { x: 0.1, y: 0.15 },
-          acceleration: 3,
-          interval: 10,
+          acceleration: 5, // 3 se 5: thoda tez
+          interval: 5, // 10 se 5: zyada baar update hota hai, to smooth lagta hai
         }}
         // Re-measure columns continuously while the board scrolls under the finger
         measuring={{
