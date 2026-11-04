@@ -26,30 +26,35 @@ const columns = [
     title: "To Do",
     subtitle: "Ready when you are",
     dot: "bg-blue-500",
-    headerBg: "bg-blue-50",
-    border: "border-blue-100",
-    countBg: "bg-blue-100 text-blue-700",
-    button: "border-blue-200 text-blue-700 hover:bg-blue-100",
+    headerBg: "bg-blue-50 dark:bg-blue-950/40",
+    border: "border-blue-100 dark:border-blue-900/60",
+    countBg: "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300",
+    button:
+      "border-blue-200 text-blue-700 hover:bg-blue-100 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950",
   },
   {
     id: "in-progress",
     title: "In Progress",
     subtitle: "Work in motion",
     dot: "bg-orange-500",
-    headerBg: "bg-orange-50",
-    border: "border-orange-100",
-    countBg: "bg-orange-100 text-orange-700",
-    button: "border-orange-200 text-orange-700 hover:bg-orange-100",
+    headerBg: "bg-orange-50 dark:bg-orange-950/40",
+    border: "border-orange-100 dark:border-orange-900/60",
+    countBg:
+      "bg-orange-100 text-orange-700 dark:bg-orange-900/60 dark:text-orange-300",
+    button:
+      "border-orange-200 text-orange-700 hover:bg-orange-100 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-950",
   },
   {
     id: "done",
     title: "Done",
     subtitle: "Look at you go!",
     dot: "bg-emerald-500",
-    headerBg: "bg-emerald-50",
-    border: "border-emerald-100",
-    countBg: "bg-emerald-100 text-emerald-700",
-    button: "border-emerald-200 text-emerald-700 hover:bg-emerald-100",
+    headerBg: "bg-emerald-50 dark:bg-emerald-950/40",
+    border: "border-emerald-100 dark:border-emerald-900/60",
+    countBg:
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300",
+    button:
+      "border-emerald-200 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-950",
   },
 ];
 
@@ -58,6 +63,12 @@ const priorityOrder = {
   Medium: 2,
   Low: 3,
 };
+
+const selectClass =
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500 dark:focus:ring-blue-950";
+
+const labelClass =
+  "mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400";
 
 function Board({ onAddTask, onEditTask }) {
   const {
@@ -197,9 +208,11 @@ function Board({ onAddTask, onEditTask }) {
       {/* Board toolbar */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-800">Your Tasks</h2>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+            Your Tasks
+          </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Manage your work across all stages.
           </p>
         </div>
@@ -210,8 +223,8 @@ function Board({ onAddTask, onEditTask }) {
           aria-expanded={isFilterOpen}
           className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
             hasActiveControls
-              ? "border-blue-200 bg-blue-50 text-blue-700"
-              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-300"
+              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
           }`}
         >
           <FiFilter size={15} />
@@ -232,9 +245,9 @@ function Board({ onAddTask, onEditTask }) {
 
       {/* Filter panel */}
       {isFilterOpen && (
-        <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-800">
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">
               Filter & Sort Tasks
             </h3>
 
@@ -242,7 +255,7 @@ function Board({ onAddTask, onEditTask }) {
               type="button"
               onClick={() => setIsFilterOpen(false)}
               aria-label="Close filters"
-              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
               <FiX size={18} />
             </button>
@@ -250,10 +263,7 @@ function Board({ onAddTask, onEditTask }) {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <div>
-              <label
-                htmlFor="priorityFilter"
-                className="mb-2 block text-sm font-medium text-slate-600"
-              >
+              <label htmlFor="priorityFilter" className={labelClass}>
                 Priority
               </label>
 
@@ -261,7 +271,7 @@ function Board({ onAddTask, onEditTask }) {
                 id="priorityFilter"
                 value={priorityFilter}
                 onChange={(event) => setPriorityFilter(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className={selectClass}
               >
                 <option value="all">All Priorities</option>
                 <option value="High">High</option>
@@ -271,10 +281,7 @@ function Board({ onAddTask, onEditTask }) {
             </div>
 
             <div>
-              <label
-                htmlFor="categoryFilter"
-                className="mb-2 block text-sm font-medium text-slate-600"
-              >
+              <label htmlFor="categoryFilter" className={labelClass}>
                 Category
               </label>
 
@@ -282,7 +289,7 @@ function Board({ onAddTask, onEditTask }) {
                 id="categoryFilter"
                 value={categoryFilter}
                 onChange={(event) => setCategoryFilter(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className={selectClass}
               >
                 <option value="all">All Categories</option>
                 <option value="Development">Development</option>
@@ -294,10 +301,7 @@ function Board({ onAddTask, onEditTask }) {
             </div>
 
             <div>
-              <label
-                htmlFor="sortBy"
-                className="mb-2 block text-sm font-medium text-slate-600"
-              >
+              <label htmlFor="sortBy" className={labelClass}>
                 Sort By
               </label>
 
@@ -305,7 +309,7 @@ function Board({ onAddTask, onEditTask }) {
                 id="sortBy"
                 value={sortBy}
                 onChange={(event) => setSortBy(event.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50"
+                className={selectClass}
               >
                 <option value="default">Default Order</option>
                 <option value="priority">Priority (High to Low)</option>
@@ -316,11 +320,11 @@ function Board({ onAddTask, onEditTask }) {
           </div>
 
           {hasActiveControls && (
-            <div className="mt-4 flex justify-end border-t border-slate-100 pt-3">
+            <div className="mt-4 flex justify-end border-t border-slate-100 pt-3 dark:border-slate-800">
               <button
                 type="button"
                 onClick={handleClearFilters}
-                className="text-sm font-semibold text-blue-600 transition hover:text-blue-700"
+                className="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Clear Filters & Sorting
               </button>
@@ -331,7 +335,7 @@ function Board({ onAddTask, onEditTask }) {
 
       {/* Search summary */}
       {isSearching && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-300">
           <p className="min-w-0 break-words">
             {visibleTasks.length === 0
               ? `No tasks match "${searchQuery.trim()}"`
@@ -355,20 +359,17 @@ function Board({ onAddTask, onEditTask }) {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
-        // Slower, edge-only autoscroll so one column doesn't get skipped
         autoScroll={{
           threshold: { x: 0.1, y: 0.15 },
-          acceleration: 5, // 3 se 5: thoda tez
-          interval: 5, // 10 se 5: zyada baar update hota hai, to smooth lagta hai
+          acceleration: 5,
+          interval: 5,
         }}
-        // Re-measure columns continuously while the board scrolls under the finger
         measuring={{
           droppable: { strategy: MeasuringStrategy.Always },
         }}
       >
         <div
           className={`w-full min-w-0 overflow-x-auto pb-4 md:overflow-visible md:pb-0 ${
-            // Snap fights autoscroll during drag, so disable it while dragging
             activeTask ? "" : "snap-x snap-mandatory"
           }`}
         >

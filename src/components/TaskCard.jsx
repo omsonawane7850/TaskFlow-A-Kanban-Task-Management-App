@@ -41,27 +41,33 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
 
   const priorityStyles = {
     High: {
-      badge: "border border-rose-100 bg-rose-50 text-rose-600",
+      badge:
+        "border border-rose-100 bg-rose-50 text-rose-600 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400",
       dot: "bg-rose-500",
     },
 
     Medium: {
-      badge: "border border-amber-100 bg-amber-50 text-amber-600",
+      badge:
+        "border border-amber-100 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-400",
       dot: "bg-amber-500",
     },
 
     Low: {
-      badge: "border border-emerald-100 bg-emerald-50 text-emerald-600",
+      badge:
+        "border border-emerald-100 bg-emerald-50 text-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400",
       dot: "bg-emerald-500",
     },
   };
 
   const categoryStyles = {
-    Design: "bg-violet-50 text-violet-700",
-    Development: "bg-sky-50 text-sky-700",
-    Learning: "bg-amber-50 text-amber-700",
-    Planning: "bg-indigo-50 text-indigo-700",
-    Personal: "bg-pink-50 text-pink-700",
+    Design:
+      "bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
+    Development: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
+    Learning:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+    Planning:
+      "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
+    Personal: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
   };
 
   const statusAccent = {
@@ -73,7 +79,8 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
   const priority = priorityStyles[task.priority] || priorityStyles.Medium;
 
   const category =
-    categoryStyles[task.category] || "bg-slate-100 text-slate-700";
+    categoryStyles[task.category] ||
+    "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -128,26 +135,38 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
     onEdit(task);
   };
 
+  const isDragDisabled = isDragOverlay || isConfirmOpen;
+
+  // Desktop: poora card MOUSE se drag hoga (sirf onMouseDown).
+  // Touch: sirf move icon se drag hoga (listeners handle pe hain).
+  const cardMouseListeners =
+    !isDragDisabled && listeners?.onMouseDown
+      ? { onMouseDown: listeners.onMouseDown }
+      : {};
+
   return (
     <>
       <article
         ref={setNodeRef}
         style={dragStyle}
-        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md md:p-3 lg:p-4 ${
-          isDragOverlay ? "cursor-grabbing" : "cursor-default"
+        {...cardMouseListeners}
+        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:shadow-black/40 md:p-3 lg:p-4 ${
+          isDragOverlay
+            ? "cursor-grabbing"
+            : "[@media(pointer:fine)]:cursor-grab [@media(pointer:fine)]:active:cursor-grabbing"
         } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
       >
-        {/* Drag handle */}
+        {/* Drag handle (touch + keyboard ke liye, mouse pe bhi chalta hai) */}
         <button
           ref={setActivatorNodeRef}
           type="button"
           {...attributes}
           {...listeners}
-          disabled={isDragOverlay || isConfirmOpen}
+          disabled={isDragDisabled}
           title="Drag task to another column"
           aria-label={`Drag ${task.title}`}
           onClick={(event) => event.stopPropagation()}
-          className="absolute right-11 top-4 z-10 flex cursor-grab touch-none items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 active:cursor-grabbing lg:right-12 lg:top-5"
+          className="absolute right-11 top-4 z-10 flex cursor-grab touch-none items-center justify-center rounded-md p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-500 active:cursor-grabbing dark:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300 lg:right-12 lg:top-5"
         >
           <FiMove size={15} />
         </button>
@@ -167,7 +186,12 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
             {task.category}
           </span>
 
-          <div className="relative shrink-0" ref={menuRef}>
+          {/* mousedown yahin rok diya taaki menu click pe card drag na ho */}
+          <div
+            className="relative shrink-0"
+            ref={menuRef}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
             <button
               type="button"
               aria-label={`Task options for ${task.title}`}
@@ -178,17 +202,17 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
                 event.stopPropagation();
                 setIsMenuOpen((open) => !open);
               }}
-              className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
               <FiMoreHorizontal size={22} />
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
+              <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl dark:border-slate-700 dark:bg-slate-800">
                 <button
                   type="button"
                   onClick={handleEdit}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-950/60 dark:hover:text-indigo-300"
                 >
                   <FiEdit2 size={15} />
                   Edit task
@@ -197,7 +221,7 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 dark:text-slate-300 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
                 >
                   <FiTrash2 size={15} />
                   Delete task
@@ -208,11 +232,11 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         </div>
 
         {/* Task details */}
-        <h3 className="mb-2 line-clamp-2 break-words text-base font-bold leading-6 text-slate-800">
+        <h3 className="mb-2 line-clamp-2 break-words text-base font-bold leading-6 text-slate-800 dark:text-slate-100">
           {task.title}
         </h3>
 
-        <p className="mb-4 line-clamp-2 whitespace-pre-line break-words text-sm leading-5 text-slate-500 lg:mb-4">
+        <p className="mb-4 line-clamp-2 whitespace-pre-line break-words text-sm leading-5 text-slate-500 dark:text-slate-400 lg:mb-4">
           {task.description || "No description provided."}
         </p>
 
@@ -227,27 +251,29 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 dark:border-slate-800">
           {task.status === "done" ? (
-            <span className="inline-flex items-center gap-2 text-xs font-medium text-emerald-600">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100">
+            <span className="inline-flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/60">
                 <FiCheck size={15} />
               </span>
               Completed
             </span>
           ) : task.dueDate ? (
-            <span className="inline-flex min-w-0 items-center gap-2 text-xs text-slate-500">
+            <span className="inline-flex min-w-0 items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <FiCalendar size={17} className="shrink-0" />
               <span className="break-words">
                 Due {formatDate(task.dueDate)}
               </span>
             </span>
           ) : (
-            <span className="text-xs text-slate-400">No due date</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              No due date
+            </span>
           )}
 
           <span
-            className="inline-flex shrink-0 items-center gap-2 text-xs text-slate-400"
+            className="inline-flex shrink-0 items-center gap-2 text-xs text-slate-400 dark:text-slate-500"
             title="Comments"
           >
             <FiMessageSquare size={17} />

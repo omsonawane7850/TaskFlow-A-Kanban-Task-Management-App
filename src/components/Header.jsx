@@ -9,6 +9,8 @@ import {
   FiX,
 } from "react-icons/fi";
 
+import ThemeToggle from "./ThemeToggle";
+
 import { useTasks } from "../context/TaskContext";
 
 function Header({ onCreateTaskClick }) {
@@ -51,27 +53,33 @@ function Header({ onCreateTaskClick }) {
       type="button"
       onClick={clearSearch}
       aria-label="Clear search"
-      className="shrink-0 rounded-md p-1 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700"
+      className="shrink-0 rounded-md p-1 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-slate-200"
     >
       <FiX size={16} />
     </button>
   ) : null;
 
+  const searchBoxClass =
+    "flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 transition focus-within:border-blue-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-50 dark:border-slate-700 dark:bg-slate-800 dark:focus-within:border-blue-500 dark:focus-within:bg-slate-800 dark:focus-within:ring-blue-950";
+
+  const searchInputClass =
+    "w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-200 dark:placeholder:text-slate-500";
+
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
         {/* Logo */}
         <a href="/" className="flex shrink-0 items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-950/50">
             <FiCheckSquare size={22} />
           </div>
 
           <div>
-            <h2 className="text-xl font-extrabold tracking-tight text-slate-900">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
               TaskFlow
             </h2>
 
-            <p className="hidden text-xs text-slate-400 sm:block">
+            <p className="hidden text-xs text-slate-400 dark:text-slate-500 sm:block">
               Plan. Organize. Achieve.
             </p>
           </div>
@@ -79,7 +87,7 @@ function Header({ onCreateTaskClick }) {
 
         {/* Search (desktop) */}
         <div className="hidden max-w-md flex-1 md:block">
-          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-blue-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-50">
+          <div className={`${searchBoxClass} py-3`}>
             <FiSearch className="shrink-0 text-slate-400" size={18} />
 
             <input
@@ -90,13 +98,13 @@ function Header({ onCreateTaskClick }) {
               onKeyDown={handleSearchKeyDown}
               placeholder="Search tasks..."
               aria-label="Search tasks"
-              className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+              className={searchInputClass}
             />
 
             {clearButton}
 
             {!searchQuery && (
-              <kbd className="hidden rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-400 lg:block">
+              <kbd className="hidden rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-500 lg:block">
                 /
               </kbd>
             )}
@@ -105,32 +113,36 @@ function Header({ onCreateTaskClick }) {
 
         {/* Actions */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+          <ThemeToggle />
+
           <button
             type="button"
             aria-label="Notifications"
-            className="relative hidden h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 sm:flex"
+            className="relative hidden h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 sm:flex"
           >
             <FiBell size={20} />
 
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-rose-500" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-rose-500 dark:border-slate-900" />
           </button>
 
-          <div className="hidden h-8 w-px bg-slate-200 sm:block" />
+          <div className="hidden h-8 w-px bg-slate-200 dark:bg-slate-700 sm:block" />
 
           <button
             type="button"
-            className="hidden items-center gap-2 rounded-xl px-2 py-2 transition hover:bg-slate-50 sm:flex"
+            className="hidden items-center gap-2 rounded-xl px-2 py-2 transition hover:bg-slate-50 dark:hover:bg-slate-800 sm:flex"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700 dark:bg-violet-950/60 dark:text-violet-300">
               OM
             </div>
 
             <div className="hidden text-left lg:block">
-              <p className="text-sm font-semibold text-slate-800">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                 My Workspace
               </p>
 
-              <p className="text-xs text-slate-400">Personal account</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500">
+                Personal account
+              </p>
             </div>
 
             <FiChevronDown size={16} className="text-slate-400" />
@@ -139,7 +151,7 @@ function Header({ onCreateTaskClick }) {
           <button
             type="button"
             onClick={onCreateTaskClick}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0 sm:px-4"
+            className="flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0 dark:shadow-blue-950/50 sm:px-4"
           >
             <FiPlus size={18} />
 
@@ -151,7 +163,7 @@ function Header({ onCreateTaskClick }) {
 
       {/* Search (mobile) */}
       <div className="px-4 pb-3 md:hidden">
-        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 transition focus-within:border-blue-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-50">
+        <div className={`${searchBoxClass} py-2.5`}>
           <FiSearch className="shrink-0 text-slate-400" size={18} />
 
           <input
@@ -161,7 +173,7 @@ function Header({ onCreateTaskClick }) {
             onKeyDown={handleSearchKeyDown}
             placeholder="Search tasks..."
             aria-label="Search tasks"
-            className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+            className={searchInputClass}
           />
 
           {clearButton}

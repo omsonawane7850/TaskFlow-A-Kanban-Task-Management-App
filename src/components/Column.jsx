@@ -25,7 +25,7 @@ function Column({
     <section
       ref={setNodeRef}
       className={`flex w-full min-w-0 flex-col rounded-xl transition-colors ${
-        isOver ? "bg-blue-50/50" : ""
+        isOver ? "bg-blue-50/50 dark:bg-blue-950/20" : ""
       }`}
     >
       {/* Column header */}
@@ -38,7 +38,7 @@ function Column({
               className={`h-2.5 w-2.5 shrink-0 rounded-full ${column.dot}`}
             />
 
-            <h2 className="truncate text-sm font-semibold text-slate-800 sm:text-base">
+            <h2 className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100 sm:text-base">
               {column.title}
             </h2>
           </div>
@@ -50,7 +50,9 @@ function Column({
           </span>
         </div>
 
-        <p className="text-xs text-slate-500 sm:text-sm">{column.subtitle}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+          {column.subtitle}
+        </p>
       </div>
 
       {/* Task cards */}
@@ -67,10 +69,14 @@ function Column({
         ) : (
           <div
             className={`flex min-h-32 w-full items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center sm:min-h-36 ${
-              isOver ? "border-blue-300 bg-blue-50" : "border-slate-200"
+              isOver
+                ? "border-blue-300 bg-blue-50 dark:border-blue-700 dark:bg-blue-950/30"
+                : "border-slate-200 dark:border-slate-700"
             }`}
           >
-            <p className="text-sm text-slate-400">{emptyText}</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500">
+              {emptyText}
+            </p>
           </div>
         )}
       </div>

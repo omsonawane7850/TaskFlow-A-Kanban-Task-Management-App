@@ -10,6 +10,15 @@ const initialForm = {
   status: "todo",
 };
 
+const labelClass =
+  "mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300";
+
+const inputClass =
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-950";
+
+const selectClass =
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-800 outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-500";
+
 function TaskModal({
   isOpen,
   onClose,
@@ -93,15 +102,15 @@ function TaskModal({
         }
       }}
     >
-      <div className="my-auto max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl sm:max-h-[90vh]">
+      <div className="my-auto max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl dark:border dark:border-slate-800 dark:bg-slate-900 sm:max-h-[90vh]">
         {/* Modal header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
+        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 dark:border-slate-800 sm:px-6">
           <div className="min-w-0">
-            <h2 className="text-lg font-bold text-slate-800 sm:text-xl">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 sm:text-xl">
               {isEditing ? "Edit Task" : "Create New Task"}
             </h2>
 
-            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
               {isEditing
                 ? "Update your task details."
                 : "Add a new task to your board."}
@@ -112,7 +121,7 @@ function TaskModal({
             type="button"
             onClick={handleClose}
             aria-label="Close modal"
-            className="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <FiX size={20} />
           </button>
@@ -124,10 +133,7 @@ function TaskModal({
           className="space-y-4 p-4 sm:space-y-5 sm:p-6"
         >
           <div>
-            <label
-              htmlFor="title"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
+            <label htmlFor="title" className={labelClass}>
               Task title *
             </label>
 
@@ -140,15 +146,12 @@ function TaskModal({
               placeholder="e.g. Build dashboard UI"
               required
               autoFocus
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="description"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
+            <label htmlFor="description" className={labelClass}>
               Description
             </label>
 
@@ -159,16 +162,13 @@ function TaskModal({
               onChange={handleChange}
               rows={3}
               placeholder="What needs to be done?"
-              className="w-full resize-none rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50"
+              className={`${inputClass} resize-none`}
             />
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div>
-              <label
-                htmlFor="priority"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="priority" className={labelClass}>
                 Priority
               </label>
 
@@ -177,7 +177,7 @@ function TaskModal({
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-indigo-400"
+                className={selectClass}
               >
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
@@ -186,10 +186,7 @@ function TaskModal({
             </div>
 
             <div>
-              <label
-                htmlFor="category"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="category" className={labelClass}>
                 Category
               </label>
 
@@ -198,7 +195,7 @@ function TaskModal({
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-indigo-400"
+                className={selectClass}
               >
                 <option value="Development">Development</option>
                 <option value="Design">Design</option>
@@ -209,10 +206,7 @@ function TaskModal({
             </div>
 
             <div>
-              <label
-                htmlFor="dueDate"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="dueDate" className={labelClass}>
                 Due date
               </label>
 
@@ -222,15 +216,12 @@ function TaskModal({
                 type="date"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="w-full min-w-0 rounded-xl border border-slate-200 px-3 py-3 text-sm outline-none focus:border-indigo-400"
+                className="w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-800 outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-indigo-500"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="status"
-                className="mb-2 block text-sm font-medium text-slate-700"
-              >
+              <label htmlFor="status" className={labelClass}>
                 Status
               </label>
 
@@ -239,7 +230,7 @@ function TaskModal({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-indigo-400"
+                className={selectClass}
               >
                 <option value="todo">To Do</option>
                 <option value="in-progress">In Progress</option>
@@ -249,11 +240,11 @@ function TaskModal({
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end sm:gap-3">
+          <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 dark:border-slate-800 sm:flex-row sm:justify-end sm:gap-3">
             <button
               type="button"
               onClick={handleClose}
-              className="w-full rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 sm:w-auto sm:py-2.5"
+              className="w-full rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 sm:w-auto sm:py-2.5"
             >
               Cancel
             </button>

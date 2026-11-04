@@ -22,10 +22,10 @@ function ConfirmDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
-        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:border dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="mb-5 flex items-start justify-between">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-100 text-rose-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
             <FiAlertTriangle size={23} />
           </div>
 
@@ -33,23 +33,28 @@ function ConfirmDialog({
             type="button"
             onClick={onCancel}
             aria-label="Close dialog"
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <FiX size={19} />
           </button>
         </div>
 
-        <h2 id="confirm-title" className="text-lg font-bold text-slate-900">
+        <h2
+          id="confirm-title"
+          className="text-lg font-bold text-slate-900 dark:text-slate-100"
+        >
           {title}
         </h2>
 
-        <p className="mt-2 text-sm leading-6 text-slate-500">{message}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+          {message}
+        </p>
 
         <div className="mt-7 flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             Cancel
           </button>
