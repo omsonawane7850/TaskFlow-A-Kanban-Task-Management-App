@@ -165,12 +165,13 @@ function Header({ onCreateTaskClick }) {
           <button
             type="button"
             onClick={onCreateTaskClick}
-            className="flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0 dark:shadow-blue-950/50 sm:px-4"
+            aria-label="Create task"
+            title="Create Task"
+            className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 active:translate-y-0 dark:shadow-blue-950/50 sm:px-4"
           >
             <FiPlus size={18} />
 
             <span className="hidden sm:inline">Create Task</span>
-            <span className="sm:hidden">Create</span>
           </button>
         </div>
       </div>

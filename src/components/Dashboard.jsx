@@ -52,7 +52,7 @@ function Dashboard() {
             </div>
 
             {/* Dashboard statistics */}
-            <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:min-w-[240px]">
+            <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:min-w-60">
               <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 dark:border-slate-800 dark:bg-slate-900 sm:px-4">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Total tasks
