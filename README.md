@@ -43,6 +43,12 @@ The application provides an intuitive workspace where users can create tasks, up
 - Automatically save tasks using browser LocalStorage.
 - Preserve custom tasks after refreshing the page.
 
+### 🌙 Dark & Light Mode
+
+- Switch between dark and light themes.
+- Toggle themes directly from the dashboard header.
+- Theme-aware interface across application components.
+
 ### 🔔 User Feedback
 
 - Success and error toast notifications.
@@ -86,7 +92,8 @@ taskflow/
 │   │   ├── TaskCard.jsx
 │   │   ├── TaskModal.jsx
 │   │   ├── ConfirmDialog.jsx
-│   │   └── Toast.jsx
+│   │   ├── Toast.jsx
+│   │   └── ThemeToggle.jsx
 │   │
 │   ├── context/
 │   │   └── TaskContext.jsx
@@ -121,7 +128,7 @@ git clone YOUR_REPOSITORY_URL
 ### 2. Navigate to the Project
 
 ```bash
-cd kanban-task-manager
+cd TaskFlow
 ```
 
 ### 3. Install Dependencies
@@ -145,7 +152,8 @@ Open the local URL displayed in your terminal to access TaskFlow.
 3. Organize tasks into To Do, In Progress, and Done columns.
 4. Drag and drop tasks to update their status.
 5. Use search, filters, and sorting to find specific tasks.
-6. Track your progress through dashboard statistics.
+6. Switch between dark and light themes.
+7. Track your progress through dashboard statistics.
 
 ## Data Storage
 
@@ -164,8 +172,6 @@ No backend or database is required. Tasks are stored locally in the browser, so 
 ## Author
 
 **Om Sonawane**
-
-- GitHub: [@omsonawane7850](https://github.com/omsonawane7850)
 
 ---
 
