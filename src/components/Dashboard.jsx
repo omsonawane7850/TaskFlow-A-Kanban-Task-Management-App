@@ -1,5 +1,3 @@
-import { FiMenu } from "react-icons/fi";
-
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Board from "./Board";
@@ -13,7 +11,6 @@ function Dashboard() {
     stats,
 
     isSidebarOpen,
-    openSidebar,
     closeSidebar,
 
     isTaskModalOpen,
@@ -38,16 +35,6 @@ function Dashboard() {
         <Sidebar stats={stats} isOpen={isSidebarOpen} onClose={closeSidebar} />
 
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
-          {/* Mobile menu */}
-          <button
-            type="button"
-            onClick={openSidebar}
-            aria-label="Open sidebar"
-            className="mb-4 rounded-lg border border-slate-200 bg-white p-2.5 text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"
-          >
-            <FiMenu size={20} />
-          </button>
-
           {/* Dashboard heading */}
           <div className="mb-7 flex flex-col gap-5 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">

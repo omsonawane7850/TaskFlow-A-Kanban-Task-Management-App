@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import {
+  FiMenu,
   FiCheckSquare,
   FiSearch,
   FiPlus,
@@ -14,7 +15,7 @@ import ThemeToggle from "./ThemeToggle";
 import { useTasks } from "../context/TaskContext";
 
 function Header({ onCreateTaskClick }) {
-  const { searchQuery, setSearchQuery, clearSearch } = useTasks();
+  const { searchQuery, setSearchQuery, clearSearch, openSidebar } = useTasks();
 
   const searchInputRef = useRef(null);
 
@@ -67,23 +68,36 @@ function Header({ onCreateTaskClick }) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
-        {/* Logo */}
-        <a href="/" className="flex shrink-0 items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-950/50">
-            <FiCheckSquare size={22} />
-          </div>
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6 lg:px-10">
+        {/* Menu + Logo */}
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {/* Sidebar toggle (mobile / tablet) */}
+          <button
+            type="button"
+            onClick={openSidebar}
+            aria-label="Open sidebar"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 lg:hidden"
+          >
+            <FiMenu size={20} />
+          </button>
 
-          <div>
-            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
-              TaskFlow
-            </h2>
+          {/* Logo */}
+          <a href="/" className="flex shrink-0 items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-blue-950/50">
+              <FiCheckSquare size={22} />
+            </div>
 
-            <p className="hidden text-xs text-slate-400 dark:text-slate-500 sm:block">
-              Plan. Organize. Achieve.
-            </p>
-          </div>
-        </a>
+            <div>
+              <h2 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-slate-50 sm:text-xl">
+                TaskFlow
+              </h2>
+
+              <p className="hidden text-xs text-slate-400 dark:text-slate-500 sm:block">
+                Plan. Organize. Achieve.
+              </p>
+            </div>
+          </a>
+        </div>
 
         {/* Search (desktop) */}
         <div className="hidden max-w-md flex-1 md:block">
@@ -112,7 +126,7 @@ function Header({ onCreateTaskClick }) {
         </div>
 
         {/* Actions */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-4">
           <ThemeToggle />
 
           <button
