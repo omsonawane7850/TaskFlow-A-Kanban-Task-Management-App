@@ -14,93 +14,93 @@ import {
 
 import ConfirmDialog from "./ConfirmDialog";
 
-function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
+const priorityStyles = {
+  High: {
+    badge:
+      "border border-rose-100 bg-rose-50 text-rose-600 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400",
+    dot: "bg-rose-500",
+  },
+
+  Medium: {
+    badge:
+      "border border-amber-100 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-400",
+    dot: "bg-amber-500",
+  },
+
+  Low: {
+    badge:
+      "border border-emerald-100 bg-emerald-50 text-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400",
+    dot: "bg-emerald-500",
+  },
+};
+
+const categoryStyles = {
+  Design:
+    "bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
+  Development: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
+  Learning:
+    "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+  Planning:
+    "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
+  Personal: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
+};
+
+const statusAccent = {
+  todo: "bg-blue-500",
+  "in-progress": "bg-orange-500",
+  done: "bg-emerald-500",
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+
+  if (dateString.includes(",")) {
+    return dateString;
+  }
+
+  const date = new Date(`${dateString}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+};
+
+/**
+ * Sirf UI. Isme useDraggable NAHI hai, taaki DragOverlay mein
+ * isse render karne par dnd-kit ke draggable registry se na takraye.
+ */
+function TaskCardView({
+  task,
+  onEdit,
+  onDelete,
+  isConfirmOpen,
+  setIsConfirmOpen,
+  isDragOverlay = false,
+  dragProps = {},
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const menuRef = useRef(null);
 
   const {
-    attributes,
-    listeners,
     setNodeRef,
     setActivatorNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: task.id,
-    disabled: isDragOverlay || isConfirmOpen,
-  });
-
-  const dragStyle =
-    transform && !isDragOverlay
-      ? {
-          transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        }
-      : undefined;
-
-  const priorityStyles = {
-    High: {
-      badge:
-        "border border-rose-100 bg-rose-50 text-rose-600 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400",
-      dot: "bg-rose-500",
-    },
-
-    Medium: {
-      badge:
-        "border border-amber-100 bg-amber-50 text-amber-600 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-400",
-      dot: "bg-amber-500",
-    },
-
-    Low: {
-      badge:
-        "border border-emerald-100 bg-emerald-50 text-emerald-600 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400",
-      dot: "bg-emerald-500",
-    },
-  };
-
-  const categoryStyles = {
-    Design:
-      "bg-violet-50 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300",
-    Development: "bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300",
-    Learning:
-      "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
-    Planning:
-      "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
-    Personal: "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
-  };
-
-  const statusAccent = {
-    todo: "bg-blue-500",
-    "in-progress": "bg-orange-500",
-    done: "bg-emerald-500",
-  };
+    attributes,
+    listeners,
+    isDragging = false,
+  } = dragProps;
 
   const priority = priorityStyles[task.priority] || priorityStyles.Medium;
 
   const category =
     categoryStyles[task.category] ||
     "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-
-    if (dateString.includes(",")) {
-      return dateString;
-    }
-
-    const date = new Date(`${dateString}T00:00:00`);
-
-    if (Number.isNaN(date.getTime())) {
-      return dateString;
-    }
-
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    });
-  };
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -137,8 +137,8 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
 
   const isDragDisabled = isDragOverlay || isConfirmOpen;
 
-  // Desktop: poora card MOUSE se drag hoga (sirf onMouseDown).
-  // Touch: sirf move icon se drag hoga (listeners handle pe hain).
+  // Desktop: poora card mouse se drag hoga.
+  // Touch: sirf move icon se (listeners handle pe hain).
   const cardMouseListeners =
     !isDragDisabled && listeners?.onMouseDown
       ? { onMouseDown: listeners.onMouseDown }
@@ -148,20 +148,19 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
     <>
       <article
         ref={setNodeRef}
-        style={dragStyle}
         {...cardMouseListeners}
-        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:shadow-black/40 md:p-3 lg:p-4 ${
+        className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-200 dark:border-slate-800 dark:bg-slate-900 md:p-3 lg:p-4 ${
           isDragOverlay
             ? "cursor-grabbing"
-            : "pointer-fine:cursor-grab pointer-fine:active:cursor-grabbing"
-        } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
+            : "hover:-translate-y-0.5 hover:shadow-md dark:hover:shadow-black/40 pointer-fine:cursor-grab pointer-fine:active:cursor-grabbing"
+        } ${isDragging ? "opacity-30" : ""}`}
       >
-        {/* Drag handle (touch + keyboard ke liye, mouse pe bhi chalta hai) */}
+        {/* Drag handle */}
         <button
           ref={setActivatorNodeRef}
           type="button"
-          {...attributes}
-          {...listeners}
+          {...(isDragOverlay ? {} : attributes)}
+          {...(isDragOverlay ? {} : listeners)}
           disabled={isDragDisabled}
           title="Drag task to another column"
           aria-label={`Drag ${task.title}`}
@@ -291,6 +290,48 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         onConfirm={confirmDelete}
       />
     </>
+  );
+}
+
+/** Board ke <DragOverlay> mein ye use karo (useDraggable nahi chalata). */
+export function TaskCardOverlay({ task }) {
+  return (
+    <TaskCardView
+      task={task}
+      onEdit={() => {}}
+      onDelete={() => {}}
+      isConfirmOpen={false}
+      setIsConfirmOpen={() => {}}
+      isDragOverlay
+    />
+  );
+}
+
+/** Column ke andar wala asli draggable card. */
+function TaskCard({ task, onEdit, onDelete }) {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } =
+    useDraggable({
+      id: task.id,
+      disabled: isConfirmOpen,
+    });
+
+  return (
+    <TaskCardView
+      task={task}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      isConfirmOpen={isConfirmOpen}
+      setIsConfirmOpen={setIsConfirmOpen}
+      dragProps={{
+        setNodeRef,
+        setActivatorNodeRef,
+        attributes,
+        listeners,
+        isDragging,
+      }}
+    />
   );
 }
 

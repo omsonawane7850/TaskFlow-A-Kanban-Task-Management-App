@@ -22,9 +22,11 @@ function Column({
       : "No tasks yet";
 
   return (
+    // h-full + min-h: poora column (cards ke neeche khali jagah bhi) drop zone hai
     <section
       ref={setNodeRef}
-      className={`flex w-full min-w-0 flex-col rounded-xl transition-colors ${
+      data-column-id={column.id}
+      className={`flex h-full min-h-72 w-full min-w-0 flex-col rounded-xl transition-colors ${
         isOver ? "bg-blue-50/50 dark:bg-blue-950/20" : ""
       }`}
     >

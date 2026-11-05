@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   DndContext,
@@ -16,7 +16,7 @@ import {
 import { FiFilter, FiChevronDown, FiX } from "react-icons/fi";
 
 import Column from "./Column";
-import TaskCard from "./TaskCard";
+import { TaskCardOverlay } from "./TaskCard";
 
 import { useTasks } from "../context/TaskContext";
 
@@ -64,6 +64,17 @@ const priorityOrder = {
   Low: 3,
 };
 
+// Stable references (har render pe naya object na bane)
+const AUTO_SCROLL = {
+  threshold: { x: 0.1, y: 0.15 },
+  acceleration: 5,
+  interval: 5,
+};
+
+const MEASURING = {
+  droppable: { strategy: MeasuringStrategy.Always },
+};
+
 const selectClass =
   "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:border-blue-500 dark:focus:ring-blue-950";
 
@@ -81,6 +92,78 @@ function Board({ onAddTask, onEditTask }) {
   } = useTasks();
 
   const [activeTask, setActiveTask] = useState(null);
+
+  // activeTask ka ref: timeout ke andar latest value chahiye
+  const activeTaskRef = useRef(null);
+
+  // DndContext ko remount karne ke liye (stuck drag reset)
+  const [dndKey, setDndKey] = useState(0);
+
+  // Drag ke dauran asli pointer position yaad rakhte hain (drop fallback ke liye)
+  const pointerRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (!activeTask) return undefined;
+
+    const readPoint = (event) => {
+      const point = event.touches?.[0] || event.changedTouches?.[0] || event;
+
+      if (typeof point.clientX === "number") {
+        pointerRef.current = { x: point.clientX, y: point.clientY };
+      }
+    };
+
+    // FAILSAFE: agar mouse/touch chhodne ke baad bhi dnd-kit drag end na kare
+    // (card cursor se chipka reh jaye), to hum khud drop kar dete hain.
+    const handleRelease = (event) => {
+      readPoint(event);
+
+      window.setTimeout(() => {
+        const stuckTask = activeTaskRef.current;
+
+        // dnd-kit ne normal tareeke se end kar diya -> kuch nahi karna
+        if (!stuckTask) return;
+
+        const targetColumnId = getColumnIdAtPointer();
+
+        console.debug("[dnd] failsafe drop", { targetColumnId });
+
+        if (targetColumnId && stuckTask.status !== targetColumnId) {
+          moveTask(stuckTask.id, targetColumnId);
+        }
+
+        activeTaskRef.current = null;
+        setActiveTask(null);
+        setDndKey((key) => key + 1); // dnd-kit ka atka hua drag reset
+      }, 120);
+    };
+
+    window.addEventListener("mousemove", readPoint);
+    window.addEventListener("touchmove", readPoint, { passive: true });
+    window.addEventListener("mouseup", handleRelease, true);
+    window.addEventListener("pointerup", handleRelease, true);
+    window.addEventListener("touchend", handleRelease, true);
+
+    return () => {
+      window.removeEventListener("mousemove", readPoint);
+      window.removeEventListener("touchmove", readPoint);
+      window.removeEventListener("mouseup", handleRelease, true);
+      window.removeEventListener("pointerup", handleRelease, true);
+      window.removeEventListener("touchend", handleRelease, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTask, moveTask]);
+
+  // Pointer ke neeche jo column hai uska id (dnd-kit ka `over` null ho tab kaam aata hai)
+  const getColumnIdAtPointer = () => {
+    const { x, y } = pointerRef.current;
+
+    const element = document
+      .elementsFromPoint(x, y)
+      .find((node) => node.dataset?.columnId);
+
+    return element?.dataset.columnId ?? null;
+  };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -167,19 +250,25 @@ function Board({ onAddTask, onEditTask }) {
   };
 
   // Drag start
-  const handleDragStart = ({ active }) => {
+  const handleDragStart = ({ active, activatorEvent }) => {
+    const startPoint = activatorEvent?.touches?.[0] || activatorEvent;
+
+    if (typeof startPoint?.clientX === "number") {
+      pointerRef.current = { x: startPoint.clientX, y: startPoint.clientY };
+    }
+
     const selectedTask = tasks.find(
       (task) => String(task.id) === String(active.id),
     );
 
+    activeTaskRef.current = selectedTask || null;
     setActiveTask(selectedTask || null);
   };
 
   // Drag end
   const handleDragEnd = ({ active, over }) => {
+    activeTaskRef.current = null;
     setActiveTask(null);
-
-    if (!over) return;
 
     const draggedTask = tasks.find(
       (task) => String(task.id) === String(active.id),
@@ -187,19 +276,25 @@ function Board({ onAddTask, onEditTask }) {
 
     if (!draggedTask) return;
 
-    const targetColumn = columns.find(
-      (column) => column.id === String(over.id),
-    );
+    // Pehle dnd-kit ka `over`, nahi mila to pointer ke neeche wala column
+    const overId = over ? String(over.id) : null;
 
-    if (!targetColumn) return;
+    const targetColumnId = columns.some((column) => column.id === overId)
+      ? overId
+      : getColumnIdAtPointer();
 
-    if (draggedTask.status === targetColumn.id) return;
+    console.debug("[dnd] drag end", { over: overId, targetColumnId });
 
-    moveTask(draggedTask.id, targetColumn.id);
+    if (!targetColumnId) return;
+
+    if (draggedTask.status === targetColumnId) return;
+
+    moveTask(draggedTask.id, targetColumnId);
   };
 
   // Drag cancel
   const handleDragCancel = () => {
+    activeTaskRef.current = null;
     setActiveTask(null);
   };
 
@@ -354,26 +449,21 @@ function Board({ onAddTask, onEditTask }) {
 
       {/* Kanban board */}
       <DndContext
+        key={dndKey}
         sensors={sensors}
         collisionDetection={handleCollisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
-        autoScroll={{
-          threshold: { x: 0.1, y: 0.15 },
-          acceleration: 5,
-          interval: 5,
-        }}
-        measuring={{
-          droppable: { strategy: MeasuringStrategy.Always },
-        }}
+        autoScroll={AUTO_SCROLL}
+        measuring={MEASURING}
       >
         <div
           className={`w-full min-w-0 overflow-x-auto pb-4 md:overflow-visible md:pb-0 ${
             activeTask ? "" : "snap-x snap-mandatory"
           }`}
         >
-          <div className="flex w-max min-w-full items-start gap-4 md:grid md:w-full md:grid-cols-3 md:gap-3 lg:gap-4">
+          <div className="flex w-max min-w-full items-stretch gap-4 md:grid md:w-full md:grid-cols-3 md:gap-3 lg:gap-4">
             {columns.map((column) => {
               const columnTasks = visibleTasks.filter(
                 (task) => task.status === column.id,
@@ -402,12 +492,7 @@ function Board({ onAddTask, onEditTask }) {
         <DragOverlay>
           {activeTask ? (
             <div className="rotate-2 cursor-grabbing opacity-95 shadow-2xl">
-              <TaskCard
-                task={activeTask}
-                onEdit={() => {}}
-                onDelete={() => {}}
-                isDragOverlay
-              />
+              <TaskCardOverlay task={activeTask} />
             </div>
           ) : null}
         </DragOverlay>
