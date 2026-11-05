@@ -42,7 +42,7 @@ function Sidebar({ stats, isOpen, onClose }) {
       )}
 
       <aside
-        className={`fixed bottom-0 left-0 top-0 z-50 flex w-[270px] flex-col border-r border-slate-200 bg-white transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-[73px] lg:z-10 lg:h-[calc(100vh-73px)] lg:translate-x-0 ${
+        className={`fixed bottom-0 left-0 top-0 z-50 flex w-67.5 flex-col border-r border-slate-200 bg-white transition-transform duration-300 dark:border-slate-800 dark:bg-slate-900 lg:sticky lg:top-18.25 lg:z-10 lg:h-[calc(100vh-73px)] lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -145,7 +145,7 @@ function Sidebar({ stats, isOpen, onClose }) {
 
         {/* Progress card */}
         <div className="border-t border-slate-100 p-5 dark:border-slate-800">
-          <div className="rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 p-4 text-white">
+          <div className="rounded-2xl bg-linear-to-br from-blue-600 to-violet-600 p-4 text-white">
             <p className="text-xs leading-1 text-blue-100">Progress Bar -</p>
 
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/20">

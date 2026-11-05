@@ -153,7 +153,7 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         className={`relative overflow-visible rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:shadow-black/40 md:p-3 lg:p-4 ${
           isDragOverlay
             ? "cursor-grabbing"
-            : "[@media(pointer:fine)]:cursor-grab [@media(pointer:fine)]:active:cursor-grabbing"
+            : "pointer-fine:cursor-grab pointer-fine:active:cursor-grabbing"
         } ${isDragging && !isDragOverlay ? "z-10 opacity-30" : ""}`}
       >
         {/* Drag handle (touch + keyboard ke liye, mouse pe bhi chalta hai) */}
@@ -232,11 +232,11 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
         </div>
 
         {/* Task details */}
-        <h3 className="mb-2 line-clamp-2 break-words text-base font-bold leading-6 text-slate-800 dark:text-slate-100">
+        <h3 className="mb-2 line-clamp-2 wrap-break-word text-base font-bold leading-6 text-slate-800 dark:text-slate-100">
           {task.title}
         </h3>
 
-        <p className="mb-4 line-clamp-2 whitespace-pre-line break-words text-sm leading-5 text-slate-500 dark:text-slate-400 lg:mb-4">
+        <p className="mb-4 line-clamp-2 whitespace-pre-line wrap-break-word text-sm leading-5 text-slate-500 dark:text-slate-400 lg:mb-4">
           {task.description || "No description provided."}
         </p>
 
@@ -262,7 +262,7 @@ function TaskCard({ task, onEdit, onDelete, isDragOverlay = false }) {
           ) : task.dueDate ? (
             <span className="inline-flex min-w-0 items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <FiCalendar size={17} className="shrink-0" />
-              <span className="break-words">
+              <span className="wrap-break-word">
                 Due {formatDate(task.dueDate)}
               </span>
             </span>

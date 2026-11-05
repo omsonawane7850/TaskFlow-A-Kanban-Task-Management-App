@@ -336,7 +336,7 @@ function Board({ onAddTask, onEditTask }) {
       {/* Search summary */}
       {isSearching && (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-300">
-          <p className="min-w-0 break-words">
+          <p className="min-w-0 wrap-break-word">
             {visibleTasks.length === 0
               ? `No tasks match "${searchQuery.trim()}"`
               : `Showing ${visibleTasks.length} of ${tasks.length} tasks for "${searchQuery.trim()}"`}
@@ -382,7 +382,7 @@ function Board({ onAddTask, onEditTask }) {
               return (
                 <div
                   key={column.id}
-                  className="w-[min(78vw,340px)] min-w-[260px] shrink-0 snap-start md:w-full md:min-w-0"
+                  className="w-[min(78vw,340px)] min-w-65 shrink-0 snap-start md:w-full md:min-w-0"
                 >
                   <Column
                     column={column}

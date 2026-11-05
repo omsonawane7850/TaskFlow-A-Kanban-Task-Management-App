@@ -17,7 +17,7 @@ function Toast({ toast, onClose }) {
   const isError = toast.type === "error";
 
   return (
-    <div className="fixed right-5 top-5 z-[100] w-[calc(100%-40px)] max-w-sm animate-[slideIn_0.3s_ease-out]">
+    <div className="fixed right-5 top-5 z-100 w-[calc(100%-40px)] max-w-sm animate-[slideIn_0.3s_ease-out]">
       <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-800">
         <div
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
